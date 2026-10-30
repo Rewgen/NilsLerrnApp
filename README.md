@@ -1,6 +1,6 @@
 # HBOD Lern-App
 
-Lern- und Prüfungs-App für E-Commerce und HBOD: 32 Tests, gut 400 Fragen, Tagesrunde mit Wiederholungsplan, Prüfungssimulation, Lernzettel und Notizen. Der Fortschritt wird auf jedem Gerät gespeichert und über einen persönlichen Lern-Code zwischen Handy und PC abgeglichen.
+Lern- und Prüfungs-App für E-Commerce und HBOD: 32 Tests, gut 400 Fragen, Tagesrunde mit Wiederholungsplan, schnelle Runden mit 5 oder 10 Fragen, Prüfungssimulation, Lernzettel und Notizen. Der Fortschritt wird auf jedem Gerät gespeichert und über einen persönlichen Lern-Code zwischen Handy und PC abgeglichen.
 
 ## Einmal einrichten (Netlify)
 
@@ -66,7 +66,9 @@ npm run lokal        # http://localhost:8888, Sync mit Speicher im Arbeitsspeich
 ## Lernmethode in der App
 
 - **Abrufen statt Wiederlesen:** Jede Frage wird erst beantwortet, dann kommt die Erklärung.
-- **Verteiltes Wiederholen (Leitner, 5 Fächer):** richtig, dann nach 1, 3, 7, 14 und 30 Tagen wieder; falsch, dann am nächsten Tag. Mehrmals am selben Tag zählt nur einmal. Gemeistert ab Fach 3, also an drei verschiedenen Tagen richtig.
+- **Verteiltes Wiederholen (Leitner, 5 Fächer):** richtig, dann nach 1, 3, 7, 14 und 30 Tagen wieder; falsch, dann am nächsten Tag. Richtig vor dem Termin (gleicher Tag, schnelle Runde, Test nochmal) lässt Fach und Termin unverändert. Gemeistert ab Fach 3, also dreimal zum Termin richtig.
+- **Schnelle Runde:** 5 oder 10 Fragen ohne Freitext, aus allen Themen, einem Modul oder einem Test. Reihenfolge der Auswahl: fällig, zuletzt falsch, neu (reihum aus verschiedenen Tests), am längsten her. Mit Serie für richtige Antworten in Folge.
+- **Am PC:** Tasten 1 bis 9 wählen eine Antwort, Enter prüft und geht weiter.
 - **Mischen:** Die Tagesrunde mischt Themen, damit ähnliche Begriffe sicher unterschieden werden.
 - **Sicherheit angeben:** Wer rät, hakt „unsicher“ an. Die Frage steigt dann nicht auf. Sichere Irrtümer werden in der Rückmeldung besonders hervorgehoben.
 - **Selbst erklären:** Lernzettel je Test, Freitexte mit Kernpunkten zum Abhaken.

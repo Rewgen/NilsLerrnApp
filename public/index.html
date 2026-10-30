@@ -95,6 +95,20 @@ a { color: var(--accent); }
 .today .btn.ghost { color: var(--surface); border-color: color-mix(in srgb, var(--surface) 40%, transparent); }
 .today .big { font-family: var(--font-display); font-size: 2rem; line-height: 1; }
 .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.duo { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.runde { display: grid; gap: 10px; align-content: start; border-color: var(--accent); }
+.runde .actions { margin-top: 4px; }
+.runde .actions .btn { flex: 1 1 0; }
+.mlist { display: grid; gap: 8px; }
+.mrow { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.mrow > .mono { color: var(--accent); font-weight: 600; grid-row: 1 / 3; }
+.mrow .bar { grid-column: 2; height: 6px; }
+.mrow .btn { grid-column: 3; grid-row: 1 / 3; min-height: 40px; padding: 8px 12px; }
+.streak { font-size: 0.8rem; padding: 3px 10px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); font-weight: 600; white-space: nowrap; }
+.keys { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+@media (hover: none), (pointer: coarse) { .keys { display: none; } }
+.score { display: flex; align-items: baseline; gap: 8px; }
+.score .of { font-family: var(--font-display); font-size: 1.4rem; color: var(--muted); }
 .modul { margin-top: 26px; }
 .modul-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
 .modul-h .mono { color: var(--accent); font-size: 0.9rem; }
@@ -201,6 +215,7 @@ details summary { cursor: pointer; font-weight: 600; }
   .nav button { flex: none; }
   .actions .btn { flex: 1 1 auto; }
 }
+@media (max-width: 640px) { .duo { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: no-preference) {
   .fb { animation: pop .18s ease-out; }
   @keyframes pop { from { transform: translateY(4px); opacity: .6; } to { transform: none; opacity: 1; } }
@@ -444,7 +459,7 @@ function renderStatus() {
 const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_RE = /^[A-HJ-NP-Z2-9]{4}(-[A-HJ-NP-Z2-9]{4}){3}$/;
 function neuerCode() { const b = new Uint8Array(16); crypto.getRandomValues(b); const s = [...b].map(x => ALPHA[x % 32]).join(""); return s.match(/.{4}/g).join("-"); }
-function normCode(s) { const r = String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/O/g, "0"); return r.length === 16 ? r.match(/.{4}/g).join("-") : r; }
+function normCode(s) { const r = String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); return r.length === 16 ? r.match(/.{4}/g).join("-") : r; }
 async function verbinde(code, neu) {
   S.code = code; S.sync.status = "lokal"; allesInOutbox(); lsSave();
   const ok = neu ? await syncJetzt() : (await holen()) && (await syncJetzt());
@@ -497,6 +512,29 @@ function fromHash() {
 window.addEventListener("hashchange", fromHash);
 $("#brand").addEventListener("click", () => go("start"));
 $("#nav").addEventListener("click", (e) => { const b = e.target.closest("button[data-go]"); if (b) go(b.dataset.go); });
+// Tastatur am PC: 1 bis 9 wählt eine Antwort, Enter prüft bzw. geht weiter
+document.addEventListener("keydown", (e) => {
+  if (S.ansicht !== "lauf" || !S.lauf || S.lauf.ende || e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
+  const t = e.target; const tag = (t && t.tagName) || "";
+  if (tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A" || (tag === "INPUT" && !/^(radio|checkbox)$/.test(t.type)) || (t && t.isContentEditable)) return;
+  const L = S.lauf; const f = aktuelleFrage(); if (!f) return;
+  const offen = !L.ergebnisse[f.id];
+  if (e.key === "Enter") {
+    if (L.modus === "lernen") { if (!offen) { e.preventDefault(); weiter(); } else if (f.typ !== "text") { e.preventDefault(); pruefe(f); } }
+    else if (L.idx < L.qids.length - 1) { e.preventDefault(); geheZu(L.idx + 1); }
+    return;
+  }
+  if (!offen || !/^[1-9]$/.test(e.key)) return;
+  const k = Number(e.key);
+  if (f.typ === "single" || f.typ === "multi") {
+    const ord = ordnungFuer(f, f.optionen.length); if (k > ord.length) return;
+    const i = ord[k - 1];
+    if (f.typ === "multi") { const s = new Set(L.eingaben[f.id] || []); if (s.has(i)) s.delete(i); else s.add(i); setEingabe(f, [...s].sort()); }
+    else setEingabe(f, i);
+  } else if (f.typ === "wahr" && k <= 2) setEingabe(f, k === 1);
+  else return;
+  e.preventDefault(); render();
+});
 
 function render() {
   const app = $("#app");
@@ -537,11 +575,16 @@ function weiterPanel() {
 function viewHeute() {
   const p = tagesplan(); const g = gesamtStats(); const st = serie();
   const neuHeute = Math.max(0, p.ziel - Math.min(p.faellig.length, p.ziel));
+  const groessen = S.daten.tests.map(t => t.fragen.length);
+  const rundenHeute = (S.laeufe.runden || []).filter(l => tagIso(new Date(l.datum)) === p.heute);
+  const besteSerie = rundenHeute.reduce((m, l) => Math.max(m, l.serie || 0), 0);
   const frag = document.createDocumentFragment();
   frag.append(h("section", { class: "hero" },
     h("div", null, h("span", { class: "label" }, new Date().toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long" })), h("h1", null, "Heute lernen")),
     weiterPanel(),
+    h("div", { class: "duo" },
     h("div", { class: "today" },
+      h("span", { class: "label", style: "color:inherit;opacity:.75" }, "Tagesrunde"),
       h("div", { class: "trio" },
         h("div", null, h("div", { class: "big mono" }, p.faellig.length), h("div", { class: "small muted" }, "fällig zum Wiederholen")),
         h("div", null, h("div", { class: "big mono" }, Math.min(neuHeute, p.neu.length)), h("div", { class: "small muted" }, "neue Fragen")),
@@ -554,6 +597,14 @@ function viewHeute() {
           ? h("button", { class: "btn primary", type: "button", onclick: () => go("lauf") }, "Tagesrunde fortsetzen")
           : h("button", { class: "btn primary", type: "button", disabled: !(p.faellig.length || p.neu.length), onclick: starteTagesrunde }, "Tagesrunde starten"),
         p.faellig.length > p.ziel ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "heute", titel: "Alle fälligen Fragen", qids: shuffled(p.faellig, Date.now() % 99991), modus: "lernen" }) }, "Alle " + p.faellig.length + " fälligen") : null)),
+    h("div", { class: "panel runde" },
+      h("span", { class: "label" }, "Zwischendurch"),
+      h("h2", null, "Schnelle Runde"),
+      h("p", { class: "small muted" }, "Ein paar Fragen aus allen Themen, ohne Freitext. Zuerst Fälliges und Fehler, dann Neues. Dauert zwei bis fünf Minuten."),
+      h("div", { class: "actions" },
+        h("button", { class: "btn primary", type: "button", onclick: () => starteRunde({ typ: "alle" }, 5) }, "5 Fragen"),
+        h("button", { class: "btn", type: "button", onclick: () => starteRunde({ typ: "alle" }, 10) }, "10 Fragen")),
+      rundenHeute.length ? h("p", { class: "small muted" }, "Heute " + rundenHeute.length + (rundenHeute.length === 1 ? " Runde" : " Runden") + " gespielt" + (besteSerie > 1 ? ", beste Serie " + besteSerie + " richtig in Folge." : ".")) : null)),
     h("div", { class: "stats" },
       h("div", { class: "stat" }, h("span", { class: "label" }, "Gemeistert"), h("b", null, g.meister), h("span", { class: "small muted mono" }, "von " + g.gesamt)),
       h("div", { class: "stat" }, h("span", { class: "label" }, "Beantwortet"), h("b", null, g.beantwortet), h("span", { class: "small muted mono" }, pct(g.richtig, g.beantwortet || 1) + " % richtig")),
@@ -564,10 +615,23 @@ function viewHeute() {
       h("i", { class: "ok", style: "width:" + ((g.richtig - g.meister) / g.gesamt * 100) + "%" }),
       h("i", { class: "part", style: "width:" + (g.teil / g.gesamt * 100) + "%" }),
       h("i", { class: "bad", style: "width:" + (g.falsch / g.gesamt * 100) + "%" })),
+    h("div", { class: "stack", style: "gap:10px" },
+      h("h3", null, "Runde nach Thema"),
+      h("div", { class: "mlist" }, S.daten.module.map(m => {
+        const s = statsVon(modulFragen(m.id));
+        return h("div", { class: "mrow" },
+          h("span", { class: "mono" }, m.id),
+          h("div", { style: "min-width:0" }, h("div", { class: "card-title" }, m.titel), h("div", { class: "small muted" }, s.meister + " von " + s.gesamt + " gemeistert · " + s.beantwortet + " beantwortet")),
+          miniBar(s),
+          rundeMoeglich(modulFragen(m.id))
+            ? h("button", { class: "btn", type: "button", "aria-label": "Runde mit 5 Fragen aus Modul " + m.id, onclick: () => starteRunde({ typ: "modul", id: m.id }, 5) }, "5 Fragen")
+            : h("button", { class: "btn", type: "button", "aria-label": "Modul " + m.id + " öffnen (Freitexte)", onclick: () => go("test", m.tests[0]) }, "Öffnen"));
+      })),
+      h("p", { class: "small muted" }, "Lieber ein ganzes Thema am Stück? Unter \"Übersicht\" ist jeder Test ein eigener Bogen mit " + Math.min(...groessen) + " bis " + Math.max(...groessen) + " Fragen.")),
     h("div", { class: "panel stack" },
       h("div", { class: "row" }, h("span", { class: "small" }, "Fragen pro Tagesrunde"), h("span", { class: "spacer" }),
         h("div", { class: "seg-ctl", role: "group", "aria-label": "Tagesziel" }, [10, 15, 20, 30].map(n => h("button", { type: "button", "aria-pressed": p.ziel === n ? "true" : "false", onclick: () => { S.einstellungen = { tagesziel: n, zeit: nowIso() }; S.outbox.einstellungen = S.einstellungen; planeSync(); render(); } }, n)))),
-      h("p", { class: "small muted" }, "So funktioniert der Wiederholungsplan: Richtig beantwortete Fragen kommen nach 1, 3, 7, 14 und 30 Tagen wieder. Falsche Antworten kommen am nächsten Tag zurück. Eine Frage gilt als gemeistert, wenn du sie an mindestens drei verschiedenen Tagen richtig hattest.")),
+      h("p", { class: "small muted" }, "So funktioniert der Wiederholungsplan: Richtig beantwortete Fragen kommen nach 1, 3, 7, 14 und 30 Tagen wieder. Falsche Antworten kommen am nächsten Tag zurück. Eine Frage gilt als gemeistert, wenn du sie dreimal zu ihrem Termin richtig hattest. Üben vor dem Termin schadet nicht, zählt aber erst am Termin.")),
     !S.code ? h("div", { class: "panel row" }, h("span", { class: "dot warn" }), h("span", { class: "small", style: "flex:1;min-width:0" }, "Dein Fortschritt liegt nur auf diesem Gerät. Verbinde Handy und PC mit einem Lern-Code."), h("button", { class: "btn", type: "button", onclick: () => go("geraete") }, "Geräte verbinden")) : null
   ));
   return frag;
@@ -584,6 +648,61 @@ function starteTagesrunde() {
   starteLauf({ art: "heute", titel: "Tagesrunde " + new Date().toLocaleDateString("de-DE"), qids: shuffled(qids, Date.now() % 100003), modus: "lernen" });
 }
 
+/* ---------- Schnelle Runde: ein paar Fragen zwischendurch ---------- */
+function modulFragen(mid) { const m = S.daten.module.find(x => x.id === mid); return m ? m.tests.flatMap(t => S.tests[t].fragen.map(f => f.id)) : []; }
+function statsVon(qids) {
+  const s = { gesamt: qids.length, beantwortet: 0, richtig: 0, teil: 0, falsch: 0, meister: 0 };
+  for (const q of qids) { const a = S.antworten[q]; if (!a) continue; s.beantwortet++; if (a.punkte >= 1) { s.richtig++; if ((a.box || 0) >= GEMEISTERT_AB) s.meister++; } else if (a.punkte > 0) s.teil++; else s.falsch++; }
+  return s;
+}
+function miniBar(s) {
+  const w = (n) => "width:" + (s.gesamt ? n / s.gesamt * 100 : 0) + "%";
+  return h("div", { class: "bar", "aria-hidden": "true" }, h("i", { class: "acc", style: w(s.meister) }), h("i", { class: "ok", style: w(s.richtig - s.meister) }), h("i", { class: "part", style: w(s.teil) }), h("i", { class: "bad", style: w(s.falsch) }));
+}
+// Eine Runde lohnt sich nur mit mindestens 3 Fragen ohne Freitext (Praxisfälle sind fast nur Freitext)
+function rundeMoeglich(qids) { return qids.filter(q => S.fragen[q].typ !== "text").length >= 3; }
+function rundePool(scope) {
+  if (scope.typ === "modul") return modulFragen(scope.id);
+  if (scope.typ === "test") return S.tests[scope.id] ? S.tests[scope.id].fragen.map(f => f.id) : [];
+  return S.reihenfolge.slice();
+}
+function rundeTitel(scope) {
+  if (scope.typ === "modul") { const m = S.daten.module.find(x => x.id === scope.id); return "Runde: Modul " + scope.id + (m ? " · " + m.titel : ""); }
+  if (scope.typ === "test" && S.tests[scope.id]) return "Runde: " + scope.id.toUpperCase() + " · " + S.tests[scope.id].titel;
+  return "Runde: alle Themen";
+}
+// Auswahl: zuerst Fälliges, dann zuletzt Falsches, dann Neues (in der Reihenfolge der Module), dann was am längsten her ist. Ohne Freitext.
+function rundeFragen(pool, n) {
+  const heute = tagIso();
+  const faellig = [], falsch = [], neu = [], rest = [];
+  for (const q of pool) {
+    if (S.fragen[q].typ === "text") continue;
+    const a = S.antworten[q];
+    if (!a) neu.push(q);
+    else if ((a.faellig || heute) <= heute) faellig.push(q);
+    else if (a.punkte < 1) falsch.push(q);
+    else rest.push(q);
+  }
+  const A = (q) => S.antworten[q];
+  faellig.sort((x, y) => (A(x).faellig || "").localeCompare(A(y).faellig || "") || (A(x).box || 0) - (A(y).box || 0));
+  rest.sort((x, y) => (A(x).zeit || "").localeCompare(A(y).zeit || ""));
+  // Neue Fragen reihum aus verschiedenen Tests, innerhalb eines Tests in der Reihenfolge des Bogens
+  const proTest = new Map();
+  for (const q of neu) { const t = S.testVon[q]; if (!proTest.has(t)) proTest.set(t, []); proTest.get(t).push(q); }
+  const reihen = shuffled([...proTest.values()], Date.now() % 7919);
+  const neuMix = [];
+  for (let r = 0; neuMix.length < neu.length; r++) for (const l of reihen) if (l[r]) neuMix.push(l[r]);
+  const wahl = [];
+  for (const liste of [faellig, falsch, neuMix, rest]) for (const q of liste) { if (wahl.length >= n) break; wahl.push(q); }
+  return shuffled(wahl, Date.now() % 1000003);
+}
+function starteRunde(scope, n) {
+  const qids = rundeFragen(rundePool(scope), n);
+  if (!qids.length) { toast("Hier gibt es keine passenden Fragen."); return; }
+  starteLauf({ art: "runde", scope, n, titel: rundeTitel(scope), qids, modus: "lernen" });
+}
+function serieJetzt(L) { const v = L.verlauf || []; let n = 0; for (let i = v.length - 1; i >= 0 && v[i]; i--) n++; return n; }
+
 /* ================= Übersicht ================= */
 function viewStart() {
   const g = gesamtStats();
@@ -597,7 +716,8 @@ function viewStart() {
   for (const m of S.daten.module) {
     frag.append(h("section", { class: "modul" },
       h("div", { class: "modul-h" }, h("span", { class: "mono" }, "Modul " + m.id), h("h2", null, m.titel)),
-      h("p", { class: "small muted" }, m.beschreibung),
+      h("div", { class: "row" }, h("p", { class: "small muted", style: "flex:1;min-width:14em;margin:0" }, m.beschreibung),
+        rundeMoeglich(modulFragen(m.id)) ? h("button", { class: "btn ghost", type: "button", onclick: () => starteRunde({ typ: "modul", id: m.id }, 5) }, "Runde mit 5 Fragen") : null),
       h("div", { class: "tests" }, m.tests.map(tid => {
         const t = S.tests[tid]; const s = testStats(t);
         let chip;
@@ -637,9 +757,10 @@ function viewTestIntro(tid) {
       h("div", { class: "actions" },
         h("button", { class: "btn primary", type: "button", onclick: () => starteLauf({ art: "test", tid, titel: t.titel, qids: t.fragen.map(f => f.id), modus: "lernen" }) }, "Lernmodus starten"),
         h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "test", tid, titel: t.titel, qids: t.fragen.map(f => f.id), modus: "pruefung" }) }, "Prüfungsmodus"),
+        rundeMoeglich(t.fragen.map(f => f.id)) ? h("button", { class: "btn", type: "button", onclick: () => starteRunde({ typ: "test", id: tid }, 5) }, "Schnelle Runde (5)") : null,
         h("button", { class: "btn ghost", type: "button", onclick: () => go("zettel", tid) }, "Lernzettel lesen"),
         falsche.length ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "fehler", tid, titel: t.titel + " (Wiederholung)", qids: falsche, modus: "lernen" }) }, falsche.length + " Fehler wiederholen") : null),
-      h("p", { class: "small muted" }, "Lernmodus: Nach jeder Frage siehst du sofort, ob es stimmt. Prüfungsmodus: wie beim Führerschein, die Auswertung kommt erst am Ende. Lernzettel: alle Antworten mit Erklärung zum Lesen.")),
+      h("p", { class: "small muted" }, "Lernmodus: Nach jeder Frage siehst du sofort, ob es stimmt. Prüfungsmodus: wie beim Führerschein, die Auswertung kommt erst am Ende. Schnelle Runde: 5 Fragen aus diesem Test ohne Freitext, zuerst Fälliges und Fehler. Lernzettel: alle Antworten mit Erklärung zum Lesen.")),
     laeufe.length ? h("div", { class: "panel stack" },
       h("h3", null, "Bisherige Durchgänge"),
       h("div", { class: "stack small" }, laeufe.slice(-6).reverse().map(l => h("div", { class: "row" }, h("span", { class: "mono" }, fmtDate(l.datum)), h("span", { class: "chip" }, l.modus === "pruefung" ? "Prüfung" : "Lernen"), h("span", { class: "spacer" }), h("span", { class: "chip " + (l.punkte / l.max >= 0.8 ? "ok" : "bad") }, fmtNum(l.punkte, l.punkte % 1 ? 1 : 0) + " / " + l.max + " (" + pct(l.punkte, l.max) + " %)"))))) : null,
@@ -688,7 +809,7 @@ function laufGeaendert() {
 function geheZu(i) { S.lauf.idx = i; laufGeaendert(); render(); }
 function eingabeVon(f) { const L = S.lauf; const w = L.eingaben[f.id]; if (w == null && f.typ === "reihe" && L.ordnung) return L.ordnung[f.id]; return w; }
 function aktuelleFrage() { const L = S.lauf; return S.fragen[L.qids[L.idx]]; }
-function zurueckZiel(L) { if (L.art === "test" || (L.art === "fehler" && L.tid)) return () => go("test", L.tid); if (L.art === "heute") return () => go("heute"); return () => go(L.art === "pruefung" ? "pruefung" : "fehler"); }
+function zurueckZiel(L) { if (L.art === "test" || (L.art === "fehler" && L.tid)) return () => go("test", L.tid); if (L.art === "heute" || L.art === "runde" || L.zurueck === "heute") return () => go("heute"); return () => go(L.art === "pruefung" ? "pruefung" : "fehler"); }
 
 function viewLauf() {
   const L = S.lauf; const f = aktuelleFrage();
@@ -698,7 +819,8 @@ function viewLauf() {
     h("div", { class: "row" },
       h("button", { class: "linkbtn", type: "button", onclick: zurueckZiel(L) }, "← Pause"),
       h("span", { class: "spacer" }),
-      h("span", { class: "chip " + (L.modus === "pruefung" ? "part" : "acc") }, L.modus === "pruefung" ? "Prüfungsmodus" : "Lernmodus")),
+      L.modus === "lernen" && serieJetzt(L) >= 2 ? h("span", { class: "streak", "aria-live": "polite" }, serieJetzt(L) + " richtig in Folge") : null,
+      h("span", { class: "chip " + (L.modus === "pruefung" ? "part" : "acc") }, L.art === "runde" ? "Schnelle Runde" : L.modus === "pruefung" ? "Prüfungsmodus" : "Lernmodus")),
     h("h2", null, L.titel),
     h("div", { class: "qgrid", role: "navigation", "aria-label": "Fragenübersicht" }, L.qids.map((qid, i) => {
       let cls = "";
@@ -750,6 +872,10 @@ function frageKarte(f, tid) {
     actions.append(h("button", { class: "btn " + (istLetzte ? "primary" : "ghost"), type: "button", onclick: () => abgeben() }, "Abgeben und auswerten"));
   }
   card.append(actions);
+  if (!erg && (f.typ === "single" || f.typ === "multi" || f.typ === "wahr")) {
+    const n = f.typ === "wahr" ? 2 : Math.min(9, f.optionen.length);
+    card.append(h("p", { class: "keys" }, "Tastatur: 1 bis " + n + " wählen" + (f.typ === "wahr" ? " (1 = Richtig, 2 = Falsch)" : "") + ", Enter " + (L.modus === "lernen" ? "prüfen und weiter" : "nächste Frage") + "."));
+  }
   if (zeigeLoesung) card.append(feedbackBox(f, erg));
   card.append(notizLink(f, tid));
   return card;
@@ -859,14 +985,17 @@ function loesungText(f) {
   if (f.typ === "text") return f.muster;
   return "";
 }
-// Wiederholungsplan: neues Fach und nächstes Fälligkeitsdatum
+// Wiederholungsplan: neues Fach und nächstes Fälligkeitsdatum.
+// Falsch: zurück in Fach 1, morgen wieder. Richtig vor dem Termin (z. B. in einer Runde oder am selben Tag): Fach und Termin bleiben.
 function plane(f, alt, punkte, unsicher) {
   const heute = tagIso();
-  const altBox = alt && gueltig(f.id, alt) ? (alt.box || 0) : 0;
-  const altTag = alt && alt.zeit ? tagIso(new Date(alt.zeit)) : null;
+  const gilt = alt && gueltig(f.id, alt);
+  const altBox = gilt ? (alt.box || 0) : 0;
+  const altTag = gilt && alt.zeit ? tagIso(new Date(alt.zeit)) : null;
   let box;
   if (punkte < 1) box = 1;
   else if (unsicher) box = Math.max(1, Math.min(altBox, 2));
+  else if (altBox > 0 && alt.faellig && alt.faellig > heute) return { box: altBox, faellig: alt.faellig };
   else if (altTag === heute && altBox > 0) box = altBox;
   else box = Math.min(5, altBox + 1);
   return { box, faellig: addTage(heute, punkte >= 1 ? ABSTAND[box] : 1) };
@@ -881,6 +1010,9 @@ function speichereAntwort(f, erg) {
   S.antworten[f.id] = rec; S.outbox.antworten[f.id] = rec;
   S.ueberarbeitet.delete(f.id);
   const heute = tagIso(); S.aktivitaet[heute] = (S.aktivitaet[heute] || 0) + 1; S.outbox.aktivitaet[heute] = S.aktivitaet[heute];
+  if (S.lauf && S.lauf.modus === "lernen" && !S.lauf.ende) {
+    const L = S.lauf; L.verlauf = (L.verlauf || []).concat(erg.punkte >= 1 ? 1 : 0); L.besteSerie = Math.max(L.besteSerie || 0, serieJetzt(L));
+  }
   if (S.lauf) laufGeaendert(); else planeSync();
 }
 function pruefe(f) {
@@ -995,10 +1127,11 @@ function abschluss() {
   let punkte = 0;
   for (const q of L.qids) punkte += (L.ergebnisse[q] && !L.ergebnisse[q].selbst ? L.ergebnisse[q].punkte : 0);
   L.punkte = punkte; L.ende = nowIso();
-  const key = L.art === "test" && L.qids.length === S.tests[L.tid].fragen.length ? L.tid : L.art === "pruefung" ? "pruefungen" : L.art === "heute" ? "tagesrunden" : null;
+  const key = L.art === "test" && L.qids.length === S.tests[L.tid].fragen.length ? L.tid : L.art === "pruefung" ? "pruefungen" : L.art === "heute" ? "tagesrunden" : L.art === "runde" ? "runden" : null;
   if (key) {
     const eintrag = { datum: L.ende, punkte, max: L.qids.length, modus: L.modus };
     if (L.art === "pruefung") eintrag.fragen = L.qids.slice();
+    if (L.art === "runde") { eintrag.bereich = L.scope && L.scope.typ !== "alle" ? L.scope.id : "alle"; eintrag.serie = L.besteSerie || 0; }
     (S.laeufe[key] = S.laeufe[key] || []).push(eintrag);
     S.outbox.laeufe[key] = S.laeufe[key];
   }
@@ -1017,8 +1150,26 @@ function viewErgebnis() {
   const ok = quote >= (S.daten.bestehen_ab || 0.8);
   const falsche = L.qids.filter(q => !L.ergebnisse[q] || L.ergebnisse[q].punkte < 1);
   const selbst = L.qids.filter(q => L.ergebnisse[q] && L.ergebnisse[q].selbst);
-  return h("section", { class: "stack" },
-    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Auswertung"), h("h1", null, L.titel)),
+  const kopf = h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Auswertung"), h("h1", null, L.titel)));
+  if (L.art === "runde") {
+    const spruch = quote >= 1 ? "Perfekt, alles richtig." : quote >= 0.8 ? "Stark." : quote >= 0.5 ? "Gut. Die falschen Fragen kommen morgen wieder." : "Dranbleiben. Die falschen Fragen kommen morgen wieder, dann sitzen sie besser.";
+    kopf.append(h("div", { class: "panel stack" },
+      h("div", { class: "row" },
+        h("div", null, h("div", { class: "score" }, h("span", { class: "result-big" }, fmtNum(p, p % 1 ? 1 : 0)), h("span", { class: "of" }, "von " + max)), h("div", { class: "small muted" }, "richtig")),
+        h("span", { class: "spacer" }),
+        (L.besteSerie || 0) >= 2 ? h("span", { class: "streak", style: "font-size:0.95rem;padding:6px 12px" }, "Beste Serie: " + L.besteSerie + " in Folge") : null),
+      h("p", null, spruch),
+      h("div", { class: "bar" }, L.qids.map(q => h("i", { class: L.ergebnisse[q] ? (L.ergebnisse[q].punkte >= 1 ? "ok" : L.ergebnisse[q].punkte > 0 ? "part" : "bad") : "bad", style: "width:" + (100 / max) + "%" }))),
+      h("div", { class: "actions" },
+        h("button", { class: "btn primary", type: "button", onclick: () => starteRunde(L.scope || { typ: "alle" }, L.n || 5) }, "Noch eine Runde"),
+        falsche.length ? h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "fehler", titel: L.titel + " – nochmal", qids: shuffled(falsche, Date.now() % 9973), modus: "lernen", zurueck: "heute" }) }, (falsche.length === 1 ? "Die falsche" : "Die " + falsche.length + " falschen") + " nochmal") : null,
+        h("button", { class: "btn ghost", type: "button", onclick: () => go("heute") }, "Fertig"))));
+    kopf.append(h("h3", null, "Die Fragen der Runde"));
+    kopf.append(reviewListe(L));
+    return kopf;
+  }
+  kopf.append(
     h("div", { class: "panel stack" },
       h("div", { class: "row" },
         h("div", null, h("div", { class: "result-big" }, pct(p, max) + " %"), h("div", { class: "small muted mono" }, fmtNum(p, p % 1 ? 1 : 0) + " von " + max + " Punkten")),
@@ -1028,19 +1179,23 @@ function viewErgebnis() {
       selbst.length ? h("p", { class: "hint" }, selbst.length + (selbst.length === 1 ? " Freitext wartet" : " Freitexte warten") + " noch auf deine Selbstbewertung. Öffne sie unten und hak die Kernpunkte ab.") : null,
       h("div", { class: "actions" },
         falsche.length ? h("button", { class: "btn primary", type: "button", onclick: () => starteLauf({ art: "fehler", tid: L.art === "test" ? L.tid : null, titel: L.titel + " – Fehler", qids: falsche, modus: "lernen" }) }, falsche.length + " Fehler üben") : null,
-        L.art === "heute" ? h("button", { class: "btn", type: "button", onclick: starteTagesrunde }, "Noch eine Runde") : h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: L.art, tid: L.tid, titel: L.titel, qids: L.qids.slice(), modus: L.modus }) }, "Nochmal"),
+        L.art === "heute" ? h("button", { class: "btn", type: "button", onclick: starteTagesrunde }, "Noch eine Tagesrunde") : h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: L.art, tid: L.tid, titel: L.titel, qids: L.qids.slice(), modus: L.modus }) }, "Nochmal"),
         h("button", { class: "btn ghost", type: "button", onclick: () => kopiereLauf(L) }, "Für Claude kopieren"),
         h("button", { class: "btn ghost", type: "button", onclick: () => go("heute") }, "Fertig"))),
     h("h3", null, "Alle Fragen im Überblick"),
-    h("div", { class: "review" }, L.qids.map((q, i) => {
-      const f = S.fragen[q]; const e = L.ergebnisse[q] || { punkte: 0, gegeben: "—" };
-      const cls = e.selbst ? "" : e.punkte >= 1 ? "ok" : e.punkte > 0 ? "part" : "bad";
-      return h("details", { class: "review-item " + cls, open: e.punkte < 1 || e.selbst },
-        h("summary", null, h("span", { class: "mono small" }, (i + 1) + ". " + q.toUpperCase() + " "), f.frage),
-        h("p", { class: "small" }, h("b", null, "Deine Antwort: "), e.gegeben || "—"),
-        f.typ !== "text" ? h("p", { class: "small" }, h("b", null, "Lösung: "), loesungText(f)) : null,
-        e.selbst ? kernBewertung(f, e.gegeben, (erg) => { L.ergebnisse[q] = erg; speichereAntwort(f, erg); render(); }) : feedbackBox(f, e));
-    })));
+    reviewListe(L));
+  return kopf;
+}
+function reviewListe(L) {
+  return h("div", { class: "review" }, L.qids.map((q, i) => {
+    const f = S.fragen[q]; const e = L.ergebnisse[q] || { punkte: 0, gegeben: "—" };
+    const cls = e.selbst ? "" : e.punkte >= 1 ? "ok" : e.punkte > 0 ? "part" : "bad";
+    return h("details", { class: "review-item " + cls, open: e.punkte < 1 || e.selbst },
+      h("summary", null, h("span", { class: "mono small" }, (i + 1) + ". " + q.toUpperCase() + " "), f.frage),
+      h("p", { class: "small" }, h("b", null, "Deine Antwort: "), e.gegeben || "—"),
+      f.typ !== "text" ? h("p", { class: "small" }, h("b", null, "Lösung: "), loesungText(f)) : null,
+      e.selbst ? kernBewertung(f, e.gegeben, (erg) => { L.ergebnisse[q] = erg; speichereAntwort(f, erg); render(); }) : feedbackBox(f, e));
+  }));
 }
 
 /* ================= Fehler üben & Prüfung ================= */
@@ -1244,6 +1399,8 @@ function viewHilfe() {
       h("h3", null, "So lernst du am besten"),
       h("ul", null,
         h("li", null, "Jeden Tag eine Tagesrunde unter \"Heute\". Kurz und regelmäßig bringt mehr als selten und lang."),
+        h("li", null, "Für zwischendurch gibt es die schnelle Runde mit 5 oder 10 Fragen, aus allen Themen, aus einem Modul oder aus einem Test. Ohne Freitext, mit Serie für richtige Antworten in Folge."),
+        h("li", null, "Ein ganzes Thema am Stück: unter \"Übersicht\" einen Test öffnen. Jeder Test ist ein eigener kurzer Bogen."),
         h("li", null, "Erst selbst antworten, dann die Lösung ansehen. Das Abrufen aus dem Kopf festigt Wissen am stärksten."),
         h("li", null, "Wenn du rätst, hak \"Ich bin unsicher\" an. Dann kommt die Frage öfter, bis sie sicher sitzt."),
         h("li", null, "Lies bei Fehlern die Erklärung und erkläre sie dir in eigenen Worten. Der Lernzettel eines Tests hilft dabei."),
@@ -1253,7 +1410,11 @@ function viewHilfe() {
       h("ul", null,
         h("li", null, "Jede Frage liegt in einem von fünf Fächern. Richtig: ein Fach weiter. Falsch: zurück in Fach 1."),
         h("li", null, "Fach 1 kommt nach 1 Tag wieder, Fach 2 nach 3, Fach 3 nach 7, Fach 4 nach 14 und Fach 5 nach 30 Tagen."),
-        h("li", null, "Gemeistert heißt: an mindestens drei verschiedenen Tagen richtig. Mehrmals am selben Tag zählt nur einmal.")),
+        h("li", null, "Gemeistert heißt: dreimal zum Termin richtig, also frühestens nach vier Tagen. Wer vor dem Termin übt, festigt das Wissen, die Frage steigt aber erst am Termin auf.")),
+      h("h3", null, "Am PC"),
+      h("ul", null,
+        h("li", null, "Mit den Tasten 1 bis 9 wählst du eine Antwort. Bei Richtig oder falsch: 1 = Richtig, 2 = Falsch."),
+        h("li", null, "Enter prüft die Antwort und geht danach zur nächsten Frage.")),
       h("h3", null, "Speichern"),
       h("ul", null,
         h("li", null, "Alles wird sofort auf dem Gerät gespeichert, auch ohne Internet."),

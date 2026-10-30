@@ -120,9 +120,15 @@ export function berichtText(doc, daten) {
   z.push("Erstellt: " + jetzt() + " · Fragenkatalog " + daten.version + " (Stand " + daten.stand + ")");
   let beantw = 0, richtig = 0, meister = 0, gesamt = 0;
   for (const q of Object.keys(fragen)) { gesamt++; const a = doc.antworten[q]; if (gueltig(q, a)) { beantw++; if (a.punkte >= 1) richtig++; if ((a.box || 0) >= 3) meister++; } }
-  z.push(`Gesamt: ${beantw} von ${gesamt} beantwortet, ${richtig} zuletzt richtig, ${meister} gemeistert (an mindestens drei Tagen richtig).`);
+  z.push(`Gesamt: ${beantw} von ${gesamt} beantwortet, ${richtig} zuletzt richtig, ${meister} gemeistert (dreimal zum Termin richtig).`);
   const tage = Object.keys(doc.aktivitaet || {}).sort();
   if (tage.length) z.push("Gelernt an " + tage.length + " Tagen, zuletzt am " + tage[tage.length - 1] + ".");
+  const l = doc.laeufe || {}; const anz = (k) => (Array.isArray(l[k]) ? l[k].length : 0);
+  const teile = [];
+  if (anz("tagesrunden")) teile.push(anz("tagesrunden") + " Tagesrunden");
+  if (anz("runden")) teile.push(anz("runden") + " schnelle Runden");
+  if (anz("pruefungen")) teile.push(anz("pruefungen") + " Prüfungssimulationen");
+  if (teile.length) z.push("Durchgänge: " + teile.join(", ") + ".");
   z.push("");
   z.push("== Stand je Test ==");
   for (const t of daten.tests) {

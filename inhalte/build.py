@@ -16,11 +16,21 @@ import dsl  # noqa: E402
 for m in ["q_a", "q_b", "q_c", "q_d", "q_e", "q_f"]:
     importlib.import_module(m)
 
-VERSION = "2.0"
+VERSION = "2.1"
 STAND = "2026-10-30"
 
 # Was sich geändert hat (neueste zuerst). Wird in der App unter "Hilfe" angezeigt.
 AENDERUNGEN = [
+    {"datum": "2026-10-30", "version": "2.1", "punkte": [
+        "Neu: Schnelle Runde mit 5 oder 10 Fragen unter \"Heute\", auch je Modul und je Test. Ohne Freitext, mit Serie für richtige Antworten in Folge.",
+        "Neu: Am PC wählst du mit den Tasten 1 bis 9 eine Antwort, Enter prüft und geht weiter.",
+        "Wiederholungsplan genauer: Richtig vor dem Termin festigt, zählt aber erst am Termin. Gemeistert heißt dreimal zum Termin richtig.",
+        "Faktencheck im Internet: Stand zur PPWR-Aussetzung nach Parlament (20.10.) und Rat (21.10.2026) neu.",
+        "Korrigiert: Die Schweiz erhebt seit 2024 keinen Zoll mehr auf Kleidung, Anmeldung und Einfuhrsteuer bleiben. Dazu Plattformbesteuerung seit 2025.",
+        "Korrigiert: Der DSA verlangt Ausweis, Zahlungskonto, Handelsregister und Selbstbescheinigung, Steuerdaten kommen aus DAC7.",
+        "Ergänzt: Kleinsendungen ab 1.11.2026 mit 2 € Bearbeitungsgebühr und Produktkennung, UK-Regel für Ware im Land, Textil-EPR bis etwa April 2028.",
+        "Genauer: adidas-Wäschelizenz liegt bei Schiessers Mutter Delta Galil, Schreibweise JTL-eazyAuction, Hinweis zur Kaufland-Anbindung.",
+    ]},
     {"datum": "2026-10-30", "version": "2.0", "punkte": [
         "Die App läuft jetzt als eigene Website. Mit einem Lern-Code ist dein Fortschritt auf Handy und PC gleich.",
         "Neu: Tagesrunde mit Wiederholungsplan. Was du richtig weißt, kommt nach 1, 3, 7, 14 und 30 Tagen wieder, Fehler am nächsten Tag.",
