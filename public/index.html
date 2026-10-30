@@ -1,0 +1,1307 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HBOD Lern-App</title>
+<meta name="description" content="Lern- und Prüfungs-App für E-Commerce und HBOD">
+<meta name="theme-color" content="#15202b">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HBOD Lernen">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #eef1f4; --surface: #ffffff; --surface-2: #f6f8fa; --ink: #15202b; --muted: #5b6773; --line: #d5dbe1;
+  --accent: #2f4bd8; --accent-ink: #ffffff; --accent-soft: #e4e9fd;
+  --ok: #1d7f55; --ok-soft: #dff3e9; --bad: #c13d2c; --bad-soft: #fbe4e0; --part: #a86a12; --part-soft: #f8ecd7;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151c; --surface: #17202a; --surface-2: #1c2733; --ink: #e6ebf0; --muted: #93a1ae; --line: #2a3642;
+    --accent: #8ea1ff; --accent-ink: #0f151c; --accent-soft: #222d4d;
+    --ok: #4cc28a; --ok-soft: #143326; --bad: #f07a6a; --bad-soft: #3a1c18; --part: #e3ad57; --part-soft: #3a2c14;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151c; --surface: #17202a; --surface-2: #1c2733; --ink: #e6ebf0; --muted: #93a1ae; --line: #2a3642;
+  --accent: #8ea1ff; --accent-ink: #0f151c; --accent-soft: #222d4d;
+  --ok: #4cc28a; --ok-soft: #143326; --bad: #f07a6a; --bad-soft: #3a1c18; --part: #e3ad57; --part-soft: #3a2c14;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 1.6rem; } h2 { font-size: 1.35rem; } h3 { font-size: 1.1rem; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+a { color: var(--accent); }
+.wrap { max-width: 760px; margin: 0 auto; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.small { font-size: 0.875rem; }
+.label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; }
+
+.top {
+  position: sticky; top: 0; z-index: 5; background: var(--surface);
+  margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px)));
+  padding: env(safe-area-inset-top, 0px) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px));
+  border-bottom: 1px solid var(--line);
+}
+.top-in { max-width: 760px; margin: 0 auto; display: flex; align-items: center; gap: 12px; padding-block: 10px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; cursor: pointer; background: none; border: 0; padding: 0; text-align: left; }
+.brand-mark { width: 34px; height: 34px; border-radius: 8px; background: var(--ink); color: var(--surface); display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 0.78rem; letter-spacing: 0; overflow: hidden; flex: none; }
+.brand-t { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1; }
+.brand-s { font-size: 0.75rem; color: var(--muted); display: inline-flex; align-items: center; gap: 5px; }
+.nav { display: flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.nav button { border: 1px solid var(--line); background: var(--surface); padding: 6px 10px; border-radius: 999px; font-size: 0.85rem; cursor: pointer; }
+.nav button[aria-current="page"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); padding: 10px 16px; border-radius: var(--radius); cursor: pointer; font-weight: 500; min-height: 44px; text-align: center; }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--bad); border-color: var(--bad); background: transparent; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:focus-visible, .nav button:focus-visible, .opt:focus-within, .card-test:focus-visible, .qgrid button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .linkbtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.spacer { flex: 1; }
+.linkbtn { background: none; border: 0; color: var(--accent); padding: 4px 0; cursor: pointer; text-decoration: underline; font-size: 0.9rem; }
+
+.hero { padding-block: 22px 8px; display: grid; gap: 14px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; min-width: 0; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; display: flex; }
+.bar i { display: block; height: 100%; }
+.bar .ok { background: var(--ok); } .bar .bad { background: var(--bad); } .bar .part { background: var(--part); } .bar .acc { background: var(--accent); }
+.today { background: var(--ink); color: var(--surface); border-radius: var(--radius); padding: 16px; display: grid; gap: 10px; }
+.today .muted { color: color-mix(in srgb, var(--surface) 70%, transparent); }
+.today .btn.primary { background: var(--surface); color: var(--ink); border-color: var(--surface); }
+.today .btn.ghost { color: var(--surface); border-color: color-mix(in srgb, var(--surface) 40%, transparent); }
+.today .big { font-family: var(--font-display); font-size: 2rem; line-height: 1; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.modul { margin-top: 26px; }
+.modul-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.modul-h .mono { color: var(--accent); font-size: 0.9rem; }
+.tests { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
+.card-test { text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 12px 10px; cursor: pointer; display: grid; gap: 8px; min-width: 0; }
+.card-test:hover { border-color: var(--accent); }
+.tag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 0.78rem; padding: 2px 7px; border-radius: 4px; background: var(--ink); color: var(--surface); }
+.chip { font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+.chip.ok { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.chip.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.chip.part { background: var(--part-soft); color: var(--part); border-color: transparent; }
+.chip.acc { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.seg { display: flex; gap: 2px; }
+.seg i { flex: 1; height: 6px; border-radius: 2px; background: var(--line); }
+.seg i.ok { background: var(--ok); } .seg i.bad { background: var(--bad); } .seg i.part { background: var(--part); } .seg i.star { background: var(--accent); }
+.card-title { font-weight: 600; line-height: 1.3; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.sheet-head { padding-block: 18px 10px; display: grid; gap: 10px; }
+.qgrid { display: flex; flex-wrap: wrap; gap: 5px; }
+.qgrid button { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); font-family: var(--font-mono); font-size: 0.8rem; cursor: pointer; padding: 0; }
+.qgrid button.ok { background: var(--ok-soft); border-color: var(--ok); color: var(--ok); }
+.qgrid button.bad { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); }
+.qgrid button.part { background: var(--part-soft); border-color: var(--part); color: var(--part); }
+.qgrid button.done { background: var(--accent-soft); border-color: var(--accent); }
+.qgrid button.cur { outline: 2px solid var(--ink); outline-offset: 1px; }
+.qmeta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.qtext { font-size: 1.12rem; font-weight: 500; line-height: 1.45; margin-top: 8px; }
+.opts { display: grid; gap: 8px; margin-top: 14px; }
+.opt { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); cursor: pointer; min-height: 48px; }
+.opt input { margin: 3px 0 0; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+.opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.opt .mark { margin-left: auto; font-size: 0.8rem; font-weight: 600; white-space: nowrap; padding-left: 8px; }
+.opt.right .mark { color: var(--ok); } .opt.wrong .mark { color: var(--bad); }
+.tf { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.tf button { min-height: 52px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); font-weight: 600; cursor: pointer; }
+.tf button.sel { border-color: var(--accent); background: var(--accent-soft); }
+.tf button.right { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.tf button.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.num { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+.num input, .codein { font: inherit; font-family: var(--font-mono); font-size: 1.2rem; width: 100%; max-width: 260px; padding: 10px 12px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.num .unit { font-family: var(--font-mono); color: var(--muted); }
+.match { display: grid; gap: 10px; margin-top: 14px; }
+.match-row { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.match-row.right { border-color: var(--ok); background: var(--ok-soft); }
+.match-row.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.match-row b { font-weight: 600; }
+select, textarea { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; max-width: 100%; }
+textarea { line-height: 1.5; resize: vertical; }
+.order { display: grid; gap: 8px; margin-top: 14px; padding: 0; list-style: none; }
+.order li { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.order li .pos { font-family: var(--font-mono); color: var(--accent); width: 1.6em; flex: none; }
+.order li span.txt { flex: 1; min-width: 0; }
+.order li .mv { display: flex; gap: 4px; flex: none; }
+.order li .mv button { width: 38px; height: 38px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; }
+.order li.right { border-color: var(--ok); background: var(--ok-soft); }
+.order li.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.conf { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; font-size: 0.9rem; color: var(--muted); cursor: pointer; }
+.conf input { width: 18px; height: 18px; accent-color: var(--part); }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; align-items: center; }
+.fb { margin-top: 16px; border-radius: var(--radius); padding: 14px 16px; border: 1px solid var(--line); background: var(--surface-2); display: grid; gap: 8px; }
+.fb.ok { border-color: var(--ok); background: var(--ok-soft); }
+.fb.bad { border-color: var(--bad); background: var(--bad-soft); }
+.fb.part { border-color: var(--part); background: var(--part-soft); }
+.fb .verdict { font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; }
+.fb.ok .verdict { color: var(--ok); } .fb.bad .verdict { color: var(--bad); } .fb.part .verdict { color: var(--part); }
+.fb ul { margin: 0; padding-left: 1.2em; }
+.fb .opt { background: var(--surface); }
+.hint { font-size: 0.88rem; border-left: 3px solid var(--part); padding-left: 10px; color: var(--ink); }
+.src { font-size: 0.8rem; color: var(--muted); }
+details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; background: var(--surface); }
+details summary { cursor: pointer; font-weight: 600; }
+.note-box { margin-top: 12px; display: grid; gap: 8px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); display: inline-block; flex: none; }
+.dot.on { background: var(--ok); } .dot.warn { background: var(--part); } .dot.off { background: var(--bad); }
+.result-big { font-family: var(--font-display); font-size: 3rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.review { display: grid; gap: 10px; margin-top: 14px; }
+.review-item { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; background: var(--surface); display: grid; gap: 6px; }
+.review-item.ok { border-left: 4px solid var(--ok); } .review-item.bad { border-left: 4px solid var(--bad); } .review-item.part { border-left: 4px solid var(--part); }
+.zettel { display: grid; gap: 12px; }
+.zettel-item { border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; background: var(--surface); display: grid; gap: 6px; }
+.zettel-item .antw { font-weight: 600; }
+.notes { display: grid; gap: 10px; margin-top: 12px; }
+.note { border: 1px solid var(--line); border-radius: var(--radius); padding: 10px 12px; background: var(--surface); display: grid; gap: 4px; }
+.prose { display: grid; gap: 10px; max-width: 65ch; }
+.prose ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.codebig { font-family: var(--font-mono); font-size: 1.35rem; letter-spacing: 0.04em; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface-2); word-break: break-all; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 999px; font-size: 0.9rem; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
+.copyarea { width: 100%; min-height: 160px; font-family: var(--font-mono); font-size: 0.8rem; }
+.empty { padding: 30px 18px; text-align: center; color: var(--muted); }
+.seg-ctl { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg-ctl button { border: 0; background: var(--surface); padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
+.seg-ctl button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+@media (max-width: 560px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .stat { padding: 10px; }
+  .stat b { font-size: 1.35rem; }
+  .panel { padding: 14px; }
+  .qtext { font-size: 1.05rem; }
+  .nav { margin-left: 0; width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav button { flex: none; }
+  .actions .btn { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fb { animation: pop .18s ease-out; }
+  @keyframes pop { from { transform: translateY(4px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+@media print { .top, .actions, .note-box { display: none !important; } body { background: #fff; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <button class="brand" id="brand" type="button" aria-label="Zur Übersicht">
+      <span class="brand-mark">KAM</span>
+      <span><span class="brand-t">HBOD Lern-App</span><br><span class="brand-s" id="savestate"><i class="dot"></i><span>Lade …</span></span></span>
+    </button>
+    <nav class="nav" id="nav" aria-label="Bereiche">
+      <button type="button" data-go="heute">Heute</button>
+      <button type="button" data-go="start">Übersicht</button>
+      <button type="button" data-go="fehler">Fehler</button>
+      <button type="button" data-go="pruefung">Prüfung</button>
+      <button type="button" data-go="notizen">Notizen</button>
+      <button type="button" data-go="geraete">Geräte</button>
+      <button type="button" data-go="hilfe">Hilfe</button>
+    </nav>
+  </div>
+</header>
+<main class="wrap" id="app">
+  <div class="empty">Die Fragen werden geladen …</div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(() => {
+"use strict";
+
+/* ================= Hilfen ================= */
+const $ = (s, r = document) => r.querySelector(s);
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  if (attrs) for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k === "text") el.textContent = v;
+    else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2), v);
+    else if (v === true) el.setAttribute(k, "");
+    else el.setAttribute(k, v);
+  }
+  for (const kid of kids.flat()) {
+    if (kid == null || kid === false) continue;
+    el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  }
+  return el;
+}
+const fmtNum = (x, dez, gruppe = true) => Number(x).toLocaleString("de-DE", { minimumFractionDigits: dez, maximumFractionDigits: dez, useGrouping: gruppe });
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const nowIso = () => new Date().toISOString();
+const fmtDate = (iso) => { try { return new Date(iso).toLocaleString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }); } catch (e) { return iso; } };
+const fmtZeit = (iso) => { try { return new Date(iso).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" }); } catch (e) { return ""; } };
+const z2 = (n) => String(n).padStart(2, "0");
+const tagIso = (d = new Date()) => d.getFullYear() + "-" + z2(d.getMonth() + 1) + "-" + z2(d.getDate());
+const addTage = (tag, n) => { const d = new Date(tag + "T12:00:00"); d.setDate(d.getDate() + n); return tagIso(d); };
+const fmtTag = (tag) => { try { return new Date(tag + "T12:00:00").toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }); } catch (e) { return tag; } };
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 3000); }
+function hashStr(s) { let x = 2166136261; for (let i = 0; i < s.length; i++) { x ^= s.charCodeAt(i); x = Math.imul(x, 16777619); } return x >>> 0; }
+function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function shuffled(arr, seed) { const r = rng(seed); const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function parseNum(str) {
+  if (str == null) return NaN;
+  let s = String(str).replace(/[€%\s]|[a-zA-ZäöüÄÖÜß]/g, "");
+  if (!s) return NaN;
+  if (s.includes(",") && s.includes(".")) s = s.replace(/\./g, "").replace(",", ".");
+  else if (s.includes(",")) s = s.replace(",", ".");
+  else if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+  return Number(s);
+}
+const klon = (x) => JSON.parse(JSON.stringify(x));
+const TYPNAME = { single: "Eine Antwort", multi: "Mehrere Antworten möglich", wahr: "Richtig oder falsch", zahl: "Zahl eingeben", zuordnen: "Zuordnen", reihe: "Reihenfolge", text: "Freitext" };
+// Wiederholungsplan (Leitner): Fach 1 bis 5, Abstand in Tagen bis zur nächsten Wiederholung
+const ABSTAND = [0, 1, 3, 7, 14, 30];
+const GEMEISTERT_AB = 3;
+
+/* ================= Zustand ================= */
+const LS = "hbod-lernapp-v2";
+const API = "/api/fortschritt";
+const leereOutbox = () => ({ antworten: {}, laeufe: {}, notizen: {}, aktivitaet: {}, einstellungen: null, lauf: null });
+const S = {
+  daten: null, fragen: {}, testVon: {}, tests: {}, reihenfolge: [],
+  antworten: {}, laeufe: {}, notizen: {}, aktivitaet: {}, einstellungen: { tagesziel: 15, zeit: "" },
+  lauf: null, laufZeit: "", resetZeit: "", code: null, lesetoken: null,
+  outbox: leereOutbox(), sync: { status: "lokal", zuletzt: null, busy: false, nochmal: false, letzterPull: 0 },
+  ansicht: "heute", offen: null, ueberarbeitet: new Set(), installPrompt: null, resetBereit: false,
+};
+
+function lsLoad() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LS) || "null");
+    if (!d) return;
+    for (const k of ["antworten", "laeufe", "notizen", "aktivitaet", "einstellungen", "lauf", "laufZeit", "resetZeit", "code", "lesetoken", "outbox"]) if (d[k] != null) S[k] = d[k];
+    S.outbox = Object.assign(leereOutbox(), S.outbox || {});
+    if (d.sync && d.sync.zuletzt) S.sync.zuletzt = d.sync.zuletzt;
+  } catch (e) {}
+}
+function lsSave() {
+  try {
+    localStorage.setItem(LS, JSON.stringify({ antworten: S.antworten, laeufe: S.laeufe, notizen: S.notizen, aktivitaet: S.aktivitaet, einstellungen: S.einstellungen,
+      lauf: S.lauf, laufZeit: S.laufZeit, resetZeit: S.resetZeit, code: S.code, lesetoken: S.lesetoken, outbox: S.outbox, sync: { zuletzt: S.sync.zuletzt } }));
+  } catch (e) {}
+}
+
+function indexDaten(d) {
+  S.daten = d; S.fragen = {}; S.testVon = {}; S.tests = {}; S.reihenfolge = [];
+  for (const t of d.tests) { S.tests[t.id] = t; for (const f of t.fragen) { S.fragen[f.id] = f; S.testVon[f.id] = t.id; S.reihenfolge.push(f.id); } }
+}
+// Antworten zu Fragen, die inzwischen überarbeitet wurden (anderer Fingerabdruck), zählen nicht mehr.
+function gueltig(qid, a) { const f = S.fragen[qid]; return !!(a && f && (!a.fp || !f.fp || a.fp === f.fp)); }
+function bereinige() {
+  for (const [q, a] of Object.entries(S.antworten)) if (!gueltig(q, a)) { if (S.fragen[q]) S.ueberarbeitet.add(q); delete S.antworten[q]; }
+  if (S.lauf && !(S.lauf.qids || []).every(q => S.fragen[q])) { S.lauf = null; }
+}
+
+/* ================= Synchronisation ================= */
+function outboxLeer(o = S.outbox) { return !Object.keys(o.antworten).length && !Object.keys(o.laeufe).length && !Object.keys(o.notizen).length && !Object.keys(o.aktivitaet).length && !o.einstellungen && !o.lauf; }
+function mischeOutbox(alt) {
+  const n = S.outbox;
+  for (const [q, a] of Object.entries(alt.antworten || {})) if (!n.antworten[q]) n.antworten[q] = a;
+  for (const [k, l] of Object.entries(alt.laeufe || {})) { const seen = new Set((n.laeufe[k] || []).map(x => x.datum)); n.laeufe[k] = (n.laeufe[k] || []).concat(l.filter(x => !seen.has(x.datum))); }
+  for (const [id, x] of Object.entries(alt.notizen || {})) if (!n.notizen[id]) n.notizen[id] = x;
+  for (const [t, x] of Object.entries(alt.aktivitaet || {})) n.aktivitaet[t] = Math.max(n.aktivitaet[t] || 0, x);
+  if (!n.einstellungen && alt.einstellungen) n.einstellungen = alt.einstellungen;
+  if (!n.lauf && alt.lauf) n.lauf = alt.lauf;
+}
+function allesInOutbox() {
+  const o = S.outbox;
+  Object.assign(o.antworten, S.antworten);
+  for (const [k, l] of Object.entries(S.laeufe)) o.laeufe[k] = l;
+  Object.assign(o.notizen, S.notizen);
+  Object.assign(o.aktivitaet, S.aktivitaet);
+  if (S.einstellungen && S.einstellungen.zeit) o.einstellungen = S.einstellungen;
+  if (S.laufZeit) o.lauf = { daten: S.lauf ? klon(S.lauf) : null, zeit: S.laufZeit };
+}
+function mergeAntwort(q, a) {
+  if (!gueltig(q, a)) { if (a && S.fragen[q]) S.ueberarbeitet.add(q); return false; }
+  const cur = S.antworten[q];
+  if (!cur || (a.zeit || "") > (cur.zeit || "")) { S.antworten[q] = a; return true; }
+  return false;
+}
+function mergeLaeufe(k, fremd) {
+  if (!Array.isArray(fremd)) return false;
+  const eigene = S.laeufe[k] || []; const seen = new Set(eigene.map(l => l.datum)); let neu = false;
+  for (const l of fremd) if (l && l.datum && !seen.has(l.datum)) { eigene.push(l); seen.add(l.datum); neu = true; }
+  eigene.sort((a, b) => (a.datum < b.datum ? -1 : 1)); S.laeufe[k] = eigene; return neu;
+}
+function uebernehme(doc) {
+  if (!doc || typeof doc !== "object") return false;
+  let neu = false;
+  if (doc.resetZeit && doc.resetZeit > (S.resetZeit || "")) {
+    S.antworten = {}; S.laeufe = {}; S.aktivitaet = {}; S.lauf = null; S.laufZeit = ""; S.resetZeit = doc.resetZeit;
+    Object.assign(S.outbox, { antworten: {}, laeufe: {}, aktivitaet: {}, lauf: null }); neu = true;
+  }
+  for (const [q, a] of Object.entries(doc.antworten || {})) if (mergeAntwort(q, a)) neu = true;
+  for (const [k, l] of Object.entries(doc.laeufe || {})) if (mergeLaeufe(k, l)) neu = true;
+  for (const [id, n] of Object.entries(doc.notizen || {})) { const cur = S.notizen[id]; if (!cur || (n.zeit || "") > (cur.zeit || "")) { S.notizen[id] = n; neu = true; } }
+  for (const [t, n] of Object.entries(doc.aktivitaet || {})) if ((n || 0) > (S.aktivitaet[t] || 0)) { S.aktivitaet[t] = n; neu = true; }
+  if (doc.einstellungen && (doc.einstellungen.zeit || "") > (S.einstellungen.zeit || "")) { S.einstellungen = doc.einstellungen; neu = true; }
+  if (doc.lauf && (doc.lauf.zeit || "") > (S.laufZeit || "") && S.ansicht !== "lauf" && S.ansicht !== "ergebnis") {
+    const d = doc.lauf.daten;
+    S.lauf = d && Array.isArray(d.qids) && d.qids.every(q => S.fragen[q]) ? d : null;
+    S.laufZeit = doc.lauf.zeit; neu = true;
+  }
+  if (doc.lesetoken) S.lesetoken = doc.lesetoken;
+  return neu;
+}
+async function api(method, body, query) {
+  const url = API + (query ? "?" + new URLSearchParams(query) : "");
+  const r = await fetch(url, { method, headers: body ? { "content-type": "application/json" } : undefined, body: body ? JSON.stringify(body) : undefined, cache: "no-store" });
+  const typ = r.headers.get("content-type") || "";
+  if (!typ.includes("json")) throw Object.assign(new Error("kein_server"), { code: "kein_server" });
+  const data = await r.json();
+  if (!r.ok) throw Object.assign(new Error(data && data.fehler || "http"), { code: (data && data.fehler) || "http" });
+  return data;
+}
+function fehlerStatus(e) { return !navigator.onLine ? "offline" : (e && e.code === "kein_server") ? "kein_server" : (e && e.code === "ungueltiger_code") ? "code" : "fehler"; }
+let syncTimer = null;
+function planeSync(ms = 1500) { lsSave(); renderStatus(); if (!S.code) return; clearTimeout(syncTimer); syncTimer = setTimeout(syncJetzt, ms); }
+async function syncJetzt(extra) {
+  if (!S.code) return;
+  clearTimeout(syncTimer);
+  if (S.sync.busy) { S.sync.nochmal = true; return; }
+  S.sync.busy = true; renderStatus();
+  const paket = S.outbox; S.outbox = leereOutbox();
+  let ok = false;
+  try {
+    const doc = await api("POST", Object.assign({ code: S.code, aenderungen: paket }, extra || {}));
+    const neu = uebernehme(doc);
+    S.sync.status = "ok"; S.sync.zuletzt = nowIso(); S.sync.letzterPull = Date.now(); ok = true;
+    if (neu && S.ansicht !== "lauf") render();
+  } catch (e) { mischeOutbox(paket); S.sync.status = fehlerStatus(e); }
+  S.sync.busy = false; lsSave(); renderStatus();
+  if (S.sync.nochmal || (ok && !outboxLeer())) { S.sync.nochmal = false; planeSync(800); }
+  return ok;
+}
+async function holen(still) {
+  if (!S.code) return false;
+  try {
+    const doc = await api("GET", null, { code: S.code });
+    const neu = uebernehme(doc);
+    S.sync.status = "ok"; S.sync.zuletzt = nowIso(); S.sync.letzterPull = Date.now(); lsSave();
+    if (neu && S.ansicht !== "lauf") render();
+  } catch (e) { S.sync.status = fehlerStatus(e); }
+  renderStatus();
+  if (!outboxLeer()) planeSync(300);
+  return S.sync.status === "ok";
+}
+document.addEventListener("visibilitychange", () => {
+  if (!S.code) return;
+  if (document.visibilityState === "visible") { if (!outboxLeer()) syncJetzt(); else if (Date.now() - S.sync.letzterPull > 10000) holen(); }
+  else if (!outboxLeer()) sendeBeacon();
+});
+window.addEventListener("pagehide", () => { if (S.code && !outboxLeer()) sendeBeacon(); });
+window.addEventListener("online", () => { if (S.code) syncJetzt(); });
+setInterval(() => { if (!S.code || document.visibilityState !== "visible") return; if (!outboxLeer()) syncJetzt(); else if (Date.now() - S.sync.letzterPull > 60000) holen(); }, 30000);
+function sendeBeacon() {
+  // Letzte Änderungen beim Schließen losschicken. Die Outbox bleibt trotzdem stehen und wird beim nächsten Start erneut gesendet (doppelt schadet nicht).
+  try { navigator.sendBeacon(API, new Blob([JSON.stringify({ code: S.code, aenderungen: S.outbox })], { type: "application/json" })); } catch (e) {}
+  lsSave();
+}
+function renderStatus() {
+  const el = $("#savestate"); if (!el) return;
+  let dot = "", txt;
+  if (!S.code) { txt = "Nur auf diesem Gerät gespeichert"; dot = "warn"; }
+  else if (S.sync.busy || !outboxLeer()) { txt = S.sync.status === "offline" ? "Offline, wird nachgeholt" : "Wird gespeichert …"; dot = S.sync.status === "offline" ? "warn" : ""; }
+  else if (S.sync.status === "ok") { txt = "Auf allen Geräten gespeichert" + (S.sync.zuletzt ? " · " + fmtZeit(S.sync.zuletzt) : ""); dot = "on"; }
+  else if (S.sync.status === "offline") { txt = "Offline, wird nachgeholt"; dot = "warn"; }
+  else if (S.sync.status === "kein_server") { txt = "Sync-Server nicht erreichbar"; dot = "off"; }
+  else if (S.sync.status === "code") { txt = "Lern-Code ungültig"; dot = "off"; }
+  else if (S.sync.status === "fehler") { txt = "Speichern gestört, neuer Versuch folgt"; dot = "off"; }
+  else { txt = "Verbinde …"; }
+  el.replaceChildren(h("i", { class: "dot " + dot }), h("span", null, txt));
+}
+
+/* ================= Lern-Code ================= */
+const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const CODE_RE = /^[A-HJ-NP-Z2-9]{4}(-[A-HJ-NP-Z2-9]{4}){3}$/;
+function neuerCode() { const b = new Uint8Array(16); crypto.getRandomValues(b); const s = [...b].map(x => ALPHA[x % 32]).join(""); return s.match(/.{4}/g).join("-"); }
+function normCode(s) { const r = String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/O/g, "0"); return r.length === 16 ? r.match(/.{4}/g).join("-") : r; }
+async function verbinde(code, neu) {
+  S.code = code; S.sync.status = "lokal"; allesInOutbox(); lsSave();
+  const ok = neu ? await syncJetzt() : (await holen()) && (await syncJetzt());
+  if (ok) toast(neu ? "Lern-Code erstellt. Dein Fortschritt wird jetzt überall gespeichert." : "Verbunden. Dein Fortschritt ist jetzt auf diesem Gerät.");
+  else toast(S.sync.status === "kein_server" ? "Der Sync-Server ist nicht erreichbar. Läuft die App auf Netlify?" : "Verbindung gerade nicht möglich. Es wird später erneut versucht.");
+  render();
+}
+function geraeteLink() { return location.origin + "/#code=" + S.code; }
+function berichtLink() { return S.lesetoken ? location.origin + "/api/bericht?t=" + S.lesetoken : ""; }
+
+/* ================= Statistik ================= */
+function statusVon(qid) { const a = S.antworten[qid]; if (!a) return ""; if (a.punkte >= 1 && (a.box || 0) >= GEMEISTERT_AB) return "star"; return a.punkte >= 1 ? "ok" : a.punkte > 0 ? "part" : "bad"; }
+function testStats(t) {
+  let beantwortet = 0, punkte = 0, meister = 0;
+  for (const f of t.fragen) { const a = S.antworten[f.id]; if (a) { beantwortet++; punkte += a.punkte; if (a.punkte >= 1 && (a.box || 0) >= GEMEISTERT_AB) meister++; } }
+  return { beantwortet, punkte, meister, gesamt: t.fragen.length };
+}
+function gesamtStats() {
+  let gesamt = 0, beantwortet = 0, richtig = 0, falsch = 0, teil = 0, meister = 0;
+  for (const q of S.reihenfolge) {
+    gesamt++; const a = S.antworten[q];
+    if (a) { beantwortet++; if (a.punkte >= 1) { richtig++; if ((a.box || 0) >= GEMEISTERT_AB) meister++; } else if (a.punkte > 0) teil++; else falsch++; }
+  }
+  return { gesamt, beantwortet, richtig, falsch, teil, meister };
+}
+function bestanden(t) { const s = testStats(t); return s.beantwortet === s.gesamt && s.punkte / s.gesamt >= (S.daten.bestehen_ab || 0.8); }
+function serie() { let n = 0; let t = tagIso(); if (!S.aktivitaet[t]) t = addTage(t, -1); while ((S.aktivitaet[t] || 0) > 0) { n++; t = addTage(t, -1); } return n; }
+function tagesplan() {
+  const heute = tagIso(); const ziel = S.einstellungen.tagesziel || 15;
+  const faellig = [], neu = [];
+  for (const q of S.reihenfolge) { const a = S.antworten[q]; if (a) { if ((a.faellig || heute) <= heute) faellig.push(q); } else neu.push(q); }
+  faellig.sort((x, y) => (S.antworten[x].faellig || "").localeCompare(S.antworten[y].faellig || "") || (S.antworten[x].box || 0) - (S.antworten[y].box || 0));
+  return { heute, ziel, faellig, neu, erledigt: S.aktivitaet[heute] || 0 };
+}
+function naechsteFaellig() { let min = null; for (const a of Object.values(S.antworten)) if (a.faellig && (!min || a.faellig < min)) min = a.faellig; return min; }
+
+/* ================= Navigation ================= */
+const VIEWS = ["heute", "start", "fehler", "pruefung", "notizen", "geraete", "hilfe", "lauf", "ergebnis"];
+function go(view, arg) { location.hash = arg ? view + "-" + arg : view; }
+function fromHash() {
+  const raw = (location.hash || "").replace(/^#/, "");
+  if (raw.startsWith("code=")) { const c = normCode(decodeURIComponent(raw.slice(5))); history.replaceState(null, "", location.pathname + "#geraete"); if (CODE_RE.test(c)) { if (c !== S.code) verbinde(c, false); } else toast("Der Link enthält keinen gültigen Lern-Code."); S.ansicht = "geraete"; render(); return; }
+  if (raw.startsWith("test-") && S.tests[raw.slice(5)]) { S.ansicht = "test"; S.offen = raw.slice(5); }
+  else if (raw.startsWith("zettel-") && S.tests[raw.slice(7)]) { S.ansicht = "zettel"; S.offen = raw.slice(7); }
+  else if (VIEWS.includes(raw)) S.ansicht = raw;
+  else S.ansicht = "heute";
+  if ((S.ansicht === "lauf" && (!S.lauf || S.lauf.ende)) || (S.ansicht === "ergebnis" && !S.lauf)) S.ansicht = "heute";
+  render();
+}
+window.addEventListener("hashchange", fromHash);
+$("#brand").addEventListener("click", () => go("start"));
+$("#nav").addEventListener("click", (e) => { const b = e.target.closest("button[data-go]"); if (b) go(b.dataset.go); });
+
+function render() {
+  const app = $("#app");
+  if (!S.daten) return;
+  const aktiv = S.ansicht === "test" || S.ansicht === "zettel" ? "start" : S.ansicht === "lauf" || S.ansicht === "ergebnis" ? "" : S.ansicht;
+  for (const b of document.querySelectorAll("#nav button")) b.setAttribute("aria-current", b.dataset.go === aktiv ? "page" : "false");
+  app.replaceChildren();
+  if (render._v !== S.ansicht) { $("#toast").hidden = true; render._v = S.ansicht; window.scrollTo({ top: 0 }); }
+  const v = S.ansicht;
+  if (v === "heute") app.append(viewHeute());
+  else if (v === "start") app.append(viewStart());
+  else if (v === "test") app.append(viewTestIntro(S.offen));
+  else if (v === "zettel") app.append(viewZettel(S.offen));
+  else if (v === "lauf") app.append(viewLauf());
+  else if (v === "ergebnis") app.append(viewErgebnis());
+  else if (v === "fehler") app.append(viewFehler());
+  else if (v === "pruefung") app.append(viewPruefung());
+  else if (v === "notizen") app.append(viewNotizen());
+  else if (v === "geraete") app.append(viewGeraete());
+  else if (v === "hilfe") app.append(viewHilfe());
+}
+
+function segBar(t) { return h("div", { class: "seg", "aria-hidden": "true" }, t.fragen.map(f => h("i", { class: statusVon(f.id) }))); }
+function offenerLauf() { return S.lauf && !S.lauf.ende ? S.lauf : null; }
+function weiterPanel() {
+  const L = offenerLauf(); if (!L) return null;
+  const beantwortet = Object.keys(L.ergebnisse || {}).length || Object.keys(L.eingaben || {}).length;
+  return h("div", { class: "panel stack" },
+    h("div", { class: "row" }, h("span", { class: "chip acc" }, "Angefangen"), h("span", { class: "small muted" }, S.laufZeit ? "zuletzt " + fmtDate(S.laufZeit) : "")),
+    h("h3", null, L.titel),
+    h("p", { class: "small muted" }, "Frage " + (L.idx + 1) + " von " + L.qids.length + ", " + beantwortet + " bearbeitet. Du kannst auf jedem Gerät weitermachen."),
+    h("div", { class: "actions" },
+      h("button", { class: "btn primary", type: "button", onclick: () => go("lauf") }, "Weitermachen"),
+      h("button", { class: "btn ghost", type: "button", onclick: () => { S.lauf = null; laufGeaendert(); render(); toast("Angefangener Durchgang verworfen."); } }, "Verwerfen")));
+}
+
+/* ================= Heute ================= */
+function viewHeute() {
+  const p = tagesplan(); const g = gesamtStats(); const st = serie();
+  const neuHeute = Math.max(0, p.ziel - Math.min(p.faellig.length, p.ziel));
+  const frag = document.createDocumentFragment();
+  frag.append(h("section", { class: "hero" },
+    h("div", null, h("span", { class: "label" }, new Date().toLocaleDateString("de-DE", { weekday: "long", day: "2-digit", month: "long" })), h("h1", null, "Heute lernen")),
+    weiterPanel(),
+    h("div", { class: "today" },
+      h("div", { class: "trio" },
+        h("div", null, h("div", { class: "big mono" }, p.faellig.length), h("div", { class: "small muted" }, "fällig zum Wiederholen")),
+        h("div", null, h("div", { class: "big mono" }, Math.min(neuHeute, p.neu.length)), h("div", { class: "small muted" }, "neue Fragen")),
+        h("div", null, h("div", { class: "big mono" }, p.erledigt), h("div", { class: "small muted" }, "heute beantwortet"))),
+      h("p", { class: "small muted" }, p.faellig.length || p.neu.length
+        ? "Eine Tagesrunde hat " + p.ziel + " Fragen: zuerst das Fällige, dann Neues in der Reihenfolge der Module. Gemischt, damit du Themen unterscheiden lernst."
+        : "Für heute ist alles erledigt. Die nächste Wiederholung ist am " + fmtTag(naechsteFaellig() || addTage(p.heute, 1)) + "."),
+      h("div", { class: "actions" },
+        offenerLauf() && offenerLauf().art === "heute"
+          ? h("button", { class: "btn primary", type: "button", onclick: () => go("lauf") }, "Tagesrunde fortsetzen")
+          : h("button", { class: "btn primary", type: "button", disabled: !(p.faellig.length || p.neu.length), onclick: starteTagesrunde }, "Tagesrunde starten"),
+        p.faellig.length > p.ziel ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "heute", titel: "Alle fälligen Fragen", qids: shuffled(p.faellig, Date.now() % 99991), modus: "lernen" }) }, "Alle " + p.faellig.length + " fälligen") : null)),
+    h("div", { class: "stats" },
+      h("div", { class: "stat" }, h("span", { class: "label" }, "Gemeistert"), h("b", null, g.meister), h("span", { class: "small muted mono" }, "von " + g.gesamt)),
+      h("div", { class: "stat" }, h("span", { class: "label" }, "Beantwortet"), h("b", null, g.beantwortet), h("span", { class: "small muted mono" }, pct(g.richtig, g.beantwortet || 1) + " % richtig")),
+      h("div", { class: "stat" }, h("span", { class: "label" }, "Tage in Folge"), h("b", null, st), h("span", { class: "small muted mono" }, st ? "weiter so" : "heute starten")),
+      h("div", { class: "stat" }, h("span", { class: "label" }, "Bestanden"), h("b", null, S.daten.tests.filter(bestanden).length), h("span", { class: "small muted mono" }, "von " + S.daten.tests.length + " Tests"))),
+    h("div", { class: "bar", role: "img", "aria-label": g.meister + " gemeistert, " + (g.richtig - g.meister) + " richtig, " + g.teil + " teilweise, " + g.falsch + " falsch von " + g.gesamt },
+      h("i", { class: "acc", style: "width:" + (g.meister / g.gesamt * 100) + "%" }),
+      h("i", { class: "ok", style: "width:" + ((g.richtig - g.meister) / g.gesamt * 100) + "%" }),
+      h("i", { class: "part", style: "width:" + (g.teil / g.gesamt * 100) + "%" }),
+      h("i", { class: "bad", style: "width:" + (g.falsch / g.gesamt * 100) + "%" })),
+    h("div", { class: "panel stack" },
+      h("div", { class: "row" }, h("span", { class: "small" }, "Fragen pro Tagesrunde"), h("span", { class: "spacer" }),
+        h("div", { class: "seg-ctl", role: "group", "aria-label": "Tagesziel" }, [10, 15, 20, 30].map(n => h("button", { type: "button", "aria-pressed": p.ziel === n ? "true" : "false", onclick: () => { S.einstellungen = { tagesziel: n, zeit: nowIso() }; S.outbox.einstellungen = S.einstellungen; planeSync(); render(); } }, n)))),
+      h("p", { class: "small muted" }, "So funktioniert der Wiederholungsplan: Richtig beantwortete Fragen kommen nach 1, 3, 7, 14 und 30 Tagen wieder. Falsche Antworten kommen am nächsten Tag zurück. Eine Frage gilt als gemeistert, wenn du sie an mindestens drei verschiedenen Tagen richtig hattest.")),
+    !S.code ? h("div", { class: "panel row" }, h("span", { class: "dot warn" }), h("span", { class: "small", style: "flex:1;min-width:0" }, "Dein Fortschritt liegt nur auf diesem Gerät. Verbinde Handy und PC mit einem Lern-Code."), h("button", { class: "btn", type: "button", onclick: () => go("geraete") }, "Geräte verbinden")) : null
+  ));
+  return frag;
+}
+function starteTagesrunde() {
+  const p = tagesplan(); const qids = p.faellig.slice(0, p.ziel);
+  let texte = qids.filter(q => S.fragen[q].typ === "text").length;
+  for (const q of p.neu) {
+    if (qids.length >= p.ziel) break;
+    if (S.fragen[q].typ === "text") { if (texte >= 1) continue; texte++; }
+    qids.push(q);
+  }
+  if (!qids.length) { toast("Für heute ist alles erledigt."); return; }
+  starteLauf({ art: "heute", titel: "Tagesrunde " + new Date().toLocaleDateString("de-DE"), qids: shuffled(qids, Date.now() % 100003), modus: "lernen" });
+}
+
+/* ================= Übersicht ================= */
+function viewStart() {
+  const g = gesamtStats();
+  const frag = document.createDocumentFragment();
+  frag.append(h("section", { class: "hero" },
+    h("div", null, h("span", { class: "label" }, "Stand " + new Date(S.daten.stand).toLocaleDateString("de-DE") + " · " + S.daten.tests.length + " Tests · " + g.gesamt + " Fragen"),
+      h("h1", null, "Alle Tests")),
+    h("p", { class: "muted" }, "Jeder Test ist ein Bogen zu einem Thema. Bestanden ab 80 %. Lies vorher den Lernzettel oder starte direkt."),
+    weiterPanel(),
+    g.falsch + g.teil > 0 ? h("div", { class: "row" }, h("button", { class: "btn", type: "button", onclick: () => go("fehler") }, (g.falsch + g.teil) + " Fragen zum Wiederholen")) : null));
+  for (const m of S.daten.module) {
+    frag.append(h("section", { class: "modul" },
+      h("div", { class: "modul-h" }, h("span", { class: "mono" }, "Modul " + m.id), h("h2", null, m.titel)),
+      h("p", { class: "small muted" }, m.beschreibung),
+      h("div", { class: "tests" }, m.tests.map(tid => {
+        const t = S.tests[tid]; const s = testStats(t);
+        let chip;
+        if (bestanden(t)) chip = h("span", { class: "chip ok" }, "Bestanden " + pct(s.punkte, s.gesamt) + " %");
+        else if (s.beantwortet === s.gesamt) chip = h("span", { class: "chip bad" }, pct(s.punkte, s.gesamt) + " % – nochmal");
+        else if (s.beantwortet > 0) chip = h("span", { class: "chip acc" }, s.beantwortet + "/" + s.gesamt + " beantwortet");
+        else chip = h("span", { class: "chip" }, "Neu");
+        const ueb = t.fragen.some(f => S.ueberarbeitet.has(f.id));
+        return h("button", { class: "card-test", type: "button", onclick: () => go("test", tid) },
+          h("div", { class: "row" }, h("span", { class: "tag" }, tid.toUpperCase()), h("span", { class: "spacer" }), chip),
+          h("div", { class: "card-title" }, t.titel),
+          h("div", { class: "small muted" }, t.fragen.length + " Fragen" + (s.meister ? " · " + s.meister + " gemeistert" : "") + (ueb ? " · überarbeitet" : "")),
+          segBar(t));
+      }))));
+  }
+  return frag;
+}
+
+function viewTestIntro(tid) {
+  const t = S.tests[tid]; const s = testStats(t);
+  const falsche = t.fragen.filter(f => S.antworten[f.id] && S.antworten[f.id].punkte < 1).map(f => f.id);
+  const ueb = t.fragen.filter(f => S.ueberarbeitet.has(f.id)).length;
+  const laeufe = S.laeufe[tid] || [];
+  const typen = {}; for (const f of t.fragen) typen[f.typ] = (typen[f.typ] || 0) + 1;
+  return h("section", { class: "stack" },
+    h("div", { class: "sheet-head" },
+      h("div", { class: "row" }, h("span", { class: "tag" }, tid.toUpperCase()), h("span", { class: "small muted" }, "Modul " + t.modul)),
+      h("h1", null, t.titel),
+      h("p", { class: "muted" }, t.beschreibung)),
+    h("div", { class: "panel stack" },
+      h("div", { class: "row" },
+        h("span", { class: "chip" }, t.fragen.length + " Fragen"),
+        Object.entries(typen).map(([k, n]) => h("span", { class: "chip" }, n + " × " + TYPNAME[k]))),
+      segBar(t),
+      h("p", { class: "small muted" }, s.beantwortet ? ("Stand: " + s.beantwortet + " von " + s.gesamt + " beantwortet, " + pct(s.punkte, s.gesamt) + " % der Punkte, " + s.meister + " gemeistert.") : "Du hast diesen Test noch nicht bearbeitet."),
+      ueb ? h("p", { class: "hint" }, ueb === 1 ? "1 Frage wurde seit deiner letzten Antwort überarbeitet und zählt neu." : ueb + " Fragen wurden seit deiner letzten Antwort überarbeitet und zählen neu.") : null,
+      h("div", { class: "actions" },
+        h("button", { class: "btn primary", type: "button", onclick: () => starteLauf({ art: "test", tid, titel: t.titel, qids: t.fragen.map(f => f.id), modus: "lernen" }) }, "Lernmodus starten"),
+        h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "test", tid, titel: t.titel, qids: t.fragen.map(f => f.id), modus: "pruefung" }) }, "Prüfungsmodus"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => go("zettel", tid) }, "Lernzettel lesen"),
+        falsche.length ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "fehler", tid, titel: t.titel + " (Wiederholung)", qids: falsche, modus: "lernen" }) }, falsche.length + " Fehler wiederholen") : null),
+      h("p", { class: "small muted" }, "Lernmodus: Nach jeder Frage siehst du sofort, ob es stimmt. Prüfungsmodus: wie beim Führerschein, die Auswertung kommt erst am Ende. Lernzettel: alle Antworten mit Erklärung zum Lesen.")),
+    laeufe.length ? h("div", { class: "panel stack" },
+      h("h3", null, "Bisherige Durchgänge"),
+      h("div", { class: "stack small" }, laeufe.slice(-6).reverse().map(l => h("div", { class: "row" }, h("span", { class: "mono" }, fmtDate(l.datum)), h("span", { class: "chip" }, l.modus === "pruefung" ? "Prüfung" : "Lernen"), h("span", { class: "spacer" }), h("span", { class: "chip " + (l.punkte / l.max >= 0.8 ? "ok" : "bad") }, fmtNum(l.punkte, l.punkte % 1 ? 1 : 0) + " / " + l.max + " (" + pct(l.punkte, l.max) + " %)"))))) : null,
+    h("div", { class: "row" }, h("button", { class: "btn ghost", type: "button", onclick: () => kopiereTest(tid) }, "Antworten für Claude kopieren"), h("span", { class: "small muted" }, "zum Besprechen in einem Chat")));
+}
+
+/* ================= Lernzettel ================= */
+function viewZettel(tid) {
+  const t = S.tests[tid];
+  return h("section", { class: "stack" },
+    h("div", { class: "sheet-head" },
+      h("div", { class: "row" }, h("button", { class: "linkbtn", type: "button", onclick: () => go("test", tid) }, "← " + tid.toUpperCase()), h("span", { class: "spacer" }), h("span", { class: "label" }, "Lernzettel")),
+      h("h1", null, t.titel),
+      h("p", { class: "muted" }, "Lies die Antworten in Ruhe und erkläre dir jede in eigenen Worten. Danach den Test aus dem Kopf beantworten, das bringt am meisten.")),
+    h("div", { class: "zettel" }, t.fragen.map((f, i) => h("div", { class: "zettel-item" },
+      h("div", { class: "row small muted" }, h("span", { class: "mono" }, (i + 1) + "."), h("span", null, TYPNAME[f.typ]), h("span", { class: "spacer" }), statusChip(f.id)),
+      h("p", null, f.frage),
+      h("p", { class: "antw" }, f.typ === "text" ? "Musterlösung: " + f.muster : loesungText(f)),
+      f.typ === "text" ? h("ul", { class: "small" }, f.kernpunkte.map(k => h("li", null, k))) : null,
+      f.typ !== "text" || (f.erklaerung && !f.erklaerung.startsWith("Vergleiche")) ? h("p", { class: "small" }, f.erklaerung) : null,
+      f.hinweis ? h("p", { class: "hint" }, "Hinweis: " + f.hinweis) : null,
+      f.quelle ? h("p", { class: "src" }, "Quelle: " + f.quelle) : null))),
+    h("div", { class: "actions" },
+      h("button", { class: "btn primary", type: "button", onclick: () => starteLauf({ art: "test", tid, titel: t.titel, qids: t.fragen.map(f => f.id), modus: "lernen" }) }, "Jetzt den Test machen"),
+      h("button", { class: "btn ghost", type: "button", onclick: () => window.print() }, "Drucken")));
+}
+function statusChip(qid) {
+  const s = statusVon(qid);
+  if (S.ueberarbeitet.has(qid) && !s) return h("span", { class: "chip part" }, "überarbeitet");
+  if (!s) return h("span", { class: "chip" }, "offen");
+  return h("span", { class: "chip " + (s === "star" ? "acc" : s) }, s === "star" ? "gemeistert" : s === "ok" ? "richtig" : s === "part" ? "teilweise" : "falsch");
+}
+
+/* ================= Ein Durchgang ================= */
+function starteLauf(cfg) {
+  S.lauf = Object.assign({ idx: 0, eingaben: {}, ergebnisse: {}, unsicher: {}, seed: Date.now() % 100000, start: nowIso() }, cfg);
+  laufGeaendert();
+  location.hash = "lauf";
+  if (S.ansicht === "lauf") render();
+}
+function laufGeaendert() {
+  S.laufZeit = nowIso();
+  S.outbox.lauf = { daten: S.lauf ? klon(S.lauf) : null, zeit: S.laufZeit };
+  planeSync(2000);
+}
+function geheZu(i) { S.lauf.idx = i; laufGeaendert(); render(); }
+function eingabeVon(f) { const L = S.lauf; const w = L.eingaben[f.id]; if (w == null && f.typ === "reihe" && L.ordnung) return L.ordnung[f.id]; return w; }
+function aktuelleFrage() { const L = S.lauf; return S.fragen[L.qids[L.idx]]; }
+function zurueckZiel(L) { if (L.art === "test" || (L.art === "fehler" && L.tid)) return () => go("test", L.tid); if (L.art === "heute") return () => go("heute"); return () => go(L.art === "pruefung" ? "pruefung" : "fehler"); }
+
+function viewLauf() {
+  const L = S.lauf; const f = aktuelleFrage();
+  const tid = S.testVon[f.id];
+  const box = h("section", { class: "stack" });
+  box.append(h("div", { class: "sheet-head" },
+    h("div", { class: "row" },
+      h("button", { class: "linkbtn", type: "button", onclick: zurueckZiel(L) }, "← Pause"),
+      h("span", { class: "spacer" }),
+      h("span", { class: "chip " + (L.modus === "pruefung" ? "part" : "acc") }, L.modus === "pruefung" ? "Prüfungsmodus" : "Lernmodus")),
+    h("h2", null, L.titel),
+    h("div", { class: "qgrid", role: "navigation", "aria-label": "Fragenübersicht" }, L.qids.map((qid, i) => {
+      let cls = "";
+      if (L.ergebnisse[qid]) cls = L.ergebnisse[qid].selbst ? "done" : L.ergebnisse[qid].punkte >= 1 ? "ok" : L.ergebnisse[qid].punkte > 0 ? "part" : "bad";
+      else if (L.eingaben[qid] != null) cls = "done";
+      if (i === L.idx) cls += " cur";
+      return h("button", { type: "button", class: cls.trim(), "aria-label": "Frage " + (i + 1), onclick: () => geheZu(i) }, i + 1);
+    }))));
+  box.append(frageKarte(f, tid));
+  return box;
+}
+
+function frageKarte(f, tid) {
+  const L = S.lauf;
+  const erg = L.ergebnisse[f.id];
+  const zeigeLoesung = !!erg && !erg.selbst && L.modus === "lernen";
+  const card = h("article", { class: "panel" });
+  const a = S.antworten[f.id];
+  card.append(h("div", { class: "qmeta" },
+    h("span", { class: "tag" }, f.id.toUpperCase()),
+    h("span", { class: "label" }, TYPNAME[f.typ]),
+    S.ueberarbeitet.has(f.id) ? h("span", { class: "chip part" }, "überarbeitet") : null,
+    a && a.box ? h("span", { class: "chip" }, "Fach " + a.box + " von 5") : null,
+    h("span", { class: "spacer" }),
+    h("span", { class: "small muted mono" }, (L.idx + 1) + " / " + L.qids.length)));
+  card.append(h("p", { class: "qtext" }, f.frage));
+  if (f.typ === "multi") card.append(h("p", { class: "small muted" }, "Kreuze alle richtigen Antworten an."));
+  const eingabe = L.eingaben[f.id];
+  card.append(eingabeFeld(f, eingabe, zeigeLoesung ? erg : null));
+  if (!erg && f.typ !== "text") {
+    const cb = h("input", { type: "checkbox", checked: !!(L.unsicher && L.unsicher[f.id]) });
+    cb.addEventListener("change", () => { L.unsicher = L.unsicher || {}; L.unsicher[f.id] = cb.checked; laufGeaendert(); });
+    card.append(h("label", { class: "conf" }, cb, "Ich bin unsicher oder habe geraten"));
+  }
+
+  const actions = h("div", { class: "actions" });
+  const istLetzte = L.idx === L.qids.length - 1;
+  if (L.modus === "lernen") {
+    if (!erg) {
+      if (f.typ === "text") actions.append(h("button", { class: "btn primary", type: "button", onclick: () => bewerteText(f, card) }, "Mit Musterlösung vergleichen"));
+      else actions.append(h("button", { class: "btn primary", type: "button", onclick: () => pruefe(f) }, "Prüfen"));
+      actions.append(h("button", { class: "btn ghost", type: "button", onclick: () => weiter() }, istLetzte ? "Zur Auswertung" : "Überspringen"));
+    } else {
+      actions.append(h("button", { class: "btn primary", type: "button", onclick: () => weiter() }, istLetzte ? "Zur Auswertung" : "Weiter"));
+    }
+  } else {
+    actions.append(h("button", { class: "btn", type: "button", disabled: L.idx === 0, onclick: () => geheZu(L.idx - 1) }, "Zurück"));
+    if (!istLetzte) actions.append(h("button", { class: "btn primary", type: "button", onclick: () => geheZu(L.idx + 1) }, "Weiter"));
+    actions.append(h("button", { class: "btn " + (istLetzte ? "primary" : "ghost"), type: "button", onclick: () => abgeben() }, "Abgeben und auswerten"));
+  }
+  card.append(actions);
+  if (zeigeLoesung) card.append(feedbackBox(f, erg));
+  card.append(notizLink(f, tid));
+  return card;
+}
+
+/* ---------- Eingabefelder ---------- */
+function ordnungFuer(f, n) { return shuffled([...Array(n).keys()], hashStr(f.id) ^ S.lauf.seed); }
+function setEingabe(f, v) { S.lauf.eingaben[f.id] = v; laufGeaendert(); }
+
+function eingabeFeld(f, wert, erg) {
+  const L = S.lauf;
+  const gesperrt = !!erg;
+  if (f.typ === "single" || f.typ === "multi") {
+    const ord = ordnungFuer(f, f.optionen.length);
+    const multi = f.typ === "multi";
+    const sel = new Set(multi ? (wert || []) : (wert != null ? [wert] : []));
+    const richtig = new Set(multi ? f.loesung : [f.loesung]);
+    return h("div", { class: "opts", role: multi ? "group" : "radiogroup" }, ord.map(i => {
+      let cls = "opt" + (sel.has(i) ? " sel" : "");
+      let mark = null;
+      if (gesperrt) {
+        if (richtig.has(i)) { cls = "opt right"; mark = sel.has(i) ? "richtig gewählt" : "richtig"; }
+        else if (sel.has(i)) { cls = "opt wrong"; mark = "falsch gewählt"; }
+      }
+      const inp = h("input", { type: multi ? "checkbox" : "radio", name: "q-" + f.id, id: "q-" + f.id + "-" + i, checked: sel.has(i), disabled: gesperrt });
+      inp.addEventListener("change", () => {
+        if (multi) { const s = new Set(L.eingaben[f.id] || []); inp.checked ? s.add(i) : s.delete(i); setEingabe(f, [...s].sort()); }
+        else setEingabe(f, i);
+        render();
+      });
+      return h("label", { class: cls, for: "q-" + f.id + "-" + i }, inp, h("span", null, f.optionen[i]), mark ? h("span", { class: "mark" }, mark) : null);
+    }));
+  }
+  if (f.typ === "wahr") {
+    const mk = (val, txt) => {
+      let cls = wert === val ? "sel" : "";
+      if (gesperrt) { if (f.loesung === val) cls = "right"; else if (wert === val) cls = "wrong"; }
+      return h("button", { type: "button", class: cls, disabled: gesperrt, "aria-pressed": wert === val ? "true" : "false", onclick: () => { setEingabe(f, val); render(); } }, txt);
+    };
+    return h("div", { class: "tf" }, mk(true, "Richtig"), mk(false, "Falsch"));
+  }
+  if (f.typ === "zahl") {
+    const inp = h("input", { type: "text", inputmode: "decimal", id: "q-" + f.id, value: wert != null ? wert : "", placeholder: "Zahl eingeben", disabled: gesperrt, "aria-label": "Deine Zahl", autocomplete: "off" });
+    inp.addEventListener("input", () => setEingabe(f, inp.value));
+    inp.addEventListener("keydown", (e) => { if (e.key === "Enter" && L.modus === "lernen" && !gesperrt) pruefe(f); });
+    return h("div", { class: "num" }, inp, f.einheit ? h("span", { class: "unit" }, f.einheit) : null);
+  }
+  if (f.typ === "zuordnen") {
+    const rechts = shuffled(f.paare.map(p => p[1]), hashStr(f.id + "r") ^ L.seed);
+    const w = wert || {};
+    return h("div", { class: "match" }, f.paare.map((p, i) => {
+      let cls = "match-row";
+      if (gesperrt) cls += w[i] === p[1] ? " right" : " wrong";
+      const s = h("select", { id: "q-" + f.id + "-" + i, disabled: gesperrt, "aria-label": "Zuordnung für " + p[0] },
+        h("option", { value: "" }, "Bitte wählen …"),
+        rechts.map(r => h("option", { value: r, selected: w[i] === r }, r)));
+      s.addEventListener("change", () => { const n = Object.assign({}, L.eingaben[f.id] || {}); if (s.value) n[i] = s.value; else delete n[i]; setEingabe(f, n); });
+      return h("div", { class: cls }, h("b", null, p[0]), s, gesperrt && w[i] !== p[1] ? h("span", { class: "small" }, "Richtig: " + p[1]) : null);
+    }));
+  }
+  if (f.typ === "reihe") {
+    L.ordnung = L.ordnung || {};
+    let reihe = wert || L.ordnung[f.id];
+    if (!reihe) {
+      reihe = ordnungFuer(f, f.elemente.length);
+      if (reihe.every((v, i) => v === i) && reihe.length > 1) reihe = reihe.slice(1).concat(reihe[0]);
+      L.ordnung[f.id] = reihe;
+    }
+    const move = (pos, d) => { const r = reihe.slice(); const j = pos + d; if (j < 0 || j >= r.length) return; [r[pos], r[j]] = [r[j], r[pos]]; setEingabe(f, r); render(); };
+    return h("ol", { class: "order" }, reihe.map((el, pos) => {
+      const cls = gesperrt ? (el === pos ? "right" : "wrong") : "";
+      return h("li", { class: cls },
+        h("span", { class: "pos" }, (pos + 1) + "."),
+        h("span", { class: "txt" }, f.elemente[el]),
+        gesperrt ? null : h("span", { class: "mv" },
+          h("button", { type: "button", "aria-label": "Nach oben", disabled: pos === 0, onclick: () => move(pos, -1) }, "↑"),
+          h("button", { type: "button", "aria-label": "Nach unten", disabled: pos === reihe.length - 1, onclick: () => move(pos, 1) }, "↓")));
+    }));
+  }
+  if (f.typ === "text") {
+    const ta = h("textarea", { id: "q-" + f.id, rows: f.mail ? 12 : 7, placeholder: f.mail ? "Schreib deine Mail hier …" : "Deine Antwort in eigenen Worten …", disabled: gesperrt });
+    ta.value = wert || "";
+    ta.addEventListener("input", () => setEingabe(f, ta.value));
+    return h("div", { class: "stack", style: "margin-top:14px" }, ta);
+  }
+  return h("p", null, "Unbekannter Fragetyp.");
+}
+
+/* ---------- Bewertung ---------- */
+function bewerte(f, wert) {
+  let ok = false, gegeben = "";
+  if (f.typ === "single") { ok = wert === f.loesung; gegeben = wert != null ? f.optionen[wert] : "—"; }
+  else if (f.typ === "multi") { const w = (wert || []).slice().sort().join(","); ok = w === f.loesung.slice().sort().join(","); gegeben = (wert || []).map(i => f.optionen[i]).join(" | ") || "—"; }
+  else if (f.typ === "wahr") { ok = wert === f.loesung; gegeben = wert == null ? "—" : (wert ? "Richtig" : "Falsch"); }
+  else if (f.typ === "zahl") { const x = parseNum(wert); ok = isFinite(x) && Math.abs(x - f.loesung) <= f.toleranz + 1e-9; gegeben = wert ? String(wert) : "—"; }
+  else if (f.typ === "zuordnen") { const w = wert || {}; ok = f.paare.every((p, i) => w[i] === p[1]); gegeben = f.paare.map((p, i) => p[0] + " → " + (w[i] || "—")).join(" | "); }
+  else if (f.typ === "reihe") { const r = wert || []; ok = r.length === f.elemente.length && r.every((v, i) => v === i); gegeben = r.map(i => f.elemente[i]).join(" → "); }
+  return { punkte: ok ? 1 : 0, gegeben };
+}
+function loesungText(f) {
+  if (f.typ === "single") return f.optionen[f.loesung];
+  if (f.typ === "multi") return f.loesung.map(i => f.optionen[i]).join(" | ");
+  if (f.typ === "wahr") return f.loesung ? "Richtig" : "Falsch";
+  if (f.typ === "zahl") return fmtNum(f.loesung, f.dezimalen, !!f.einheit) + (f.einheit ? " " + f.einheit : "");
+  if (f.typ === "zuordnen") return f.paare.map(p => p[0] + " → " + p[1]).join(" | ");
+  if (f.typ === "reihe") return f.elemente.join(" → ");
+  if (f.typ === "text") return f.muster;
+  return "";
+}
+// Wiederholungsplan: neues Fach und nächstes Fälligkeitsdatum
+function plane(f, alt, punkte, unsicher) {
+  const heute = tagIso();
+  const altBox = alt && gueltig(f.id, alt) ? (alt.box || 0) : 0;
+  const altTag = alt && alt.zeit ? tagIso(new Date(alt.zeit)) : null;
+  let box;
+  if (punkte < 1) box = 1;
+  else if (unsicher) box = Math.max(1, Math.min(altBox, 2));
+  else if (altTag === heute && altBox > 0) box = altBox;
+  else box = Math.min(5, altBox + 1);
+  return { box, faellig: addTage(heute, punkte >= 1 ? ABSTAND[box] : 1) };
+}
+function speichereAntwort(f, erg) {
+  const alt = S.antworten[f.id];
+  const unsicher = !!(S.lauf && S.lauf.unsicher && S.lauf.unsicher[f.id]);
+  const plan = plane(f, alt, erg.punkte, unsicher);
+  const rec = { punkte: erg.punkte, ok: erg.punkte >= 1, gegeben: erg.gegeben, zeit: nowIso(), versuche: (alt && gueltig(f.id, alt) && alt.versuche || 0) + 1, modus: S.lauf ? S.lauf.modus : "lernen", fp: f.fp, box: plan.box, faellig: plan.faellig };
+  if (unsicher) rec.unsicher = true;
+  if (erg.kern) rec.kern = erg.kern;
+  S.antworten[f.id] = rec; S.outbox.antworten[f.id] = rec;
+  S.ueberarbeitet.delete(f.id);
+  const heute = tagIso(); S.aktivitaet[heute] = (S.aktivitaet[heute] || 0) + 1; S.outbox.aktivitaet[heute] = S.aktivitaet[heute];
+  if (S.lauf) laufGeaendert(); else planeSync();
+}
+function pruefe(f) {
+  const L = S.lauf;
+  const w = eingabeVon(f);
+  if (w == null || (f.typ === "multi" && !w.length) || (f.typ === "zahl" && !String(w).trim())) { toast("Bitte zuerst antworten."); return; }
+  if (f.typ === "zuordnen" && Object.values(w).filter(Boolean).length < f.paare.length) { toast("Bitte alle Zeilen zuordnen."); return; }
+  const erg = bewerte(f, w);
+  L.ergebnisse[f.id] = erg;
+  speichereAntwort(f, erg);
+  render();
+  setTimeout(() => { const fb = $(".fb"); if (fb) fb.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 30);
+}
+function weiter() {
+  const L = S.lauf;
+  if (L.idx < L.qids.length - 1) geheZu(L.idx + 1);
+  else abschluss();
+}
+
+function feedbackBox(f, erg) {
+  const unsicher = S.lauf && S.lauf.unsicher && S.lauf.unsicher[f.id];
+  const cls = erg.punkte >= 1 ? "ok" : erg.punkte > 0 ? "part" : "bad";
+  const verdict = erg.punkte >= 1 ? "Richtig" : erg.punkte > 0 ? "Teilweise richtig" : "Leider falsch";
+  const box = h("div", { class: "fb " + cls, role: "status" }, h("div", { class: "verdict" }, verdict));
+  if (f.typ !== "text") {
+    if (erg.punkte >= 1 && unsicher) box.append(h("p", { class: "small" }, "Du warst unsicher. Die Frage kommt deshalb bald wieder, bis sie sicher sitzt."));
+    if (erg.punkte < 1 && !unsicher) box.append(h("p", { class: "small" }, h("b", null, "Du warst dir sicher. "), "Lies die Erklärung genau: Solche Irrtümer merkt man sich nach der Korrektur besonders gut."));
+  }
+  if (f.typ === "zahl") box.append(h("p", null, "Lösung: ", h("b", { class: "mono" }, loesungText(f)), erg.gegeben && erg.punkte < 1 ? h("span", { class: "muted" }, " · deine Eingabe: " + erg.gegeben) : null));
+  if (f.typ === "reihe" && erg.punkte < 1) box.append(h("div", null, h("b", null, "Richtige Reihenfolge:"), h("ol", null, f.elemente.map(e => h("li", null, e)))));
+  if (f.typ === "text") {
+    const kern = new Set(erg.kern || []);
+    if (erg.kern) {
+      const drin = f.kernpunkte.filter((_, i) => kern.has(i)), fehlt = f.kernpunkte.filter((_, i) => !kern.has(i));
+      box.append(h("p", null, "Du hattest " + drin.length + " von " + f.kernpunkte.length + " Kernpunkten."));
+      if (fehlt.length) box.append(h("div", null, h("b", null, "Das fehlt noch:"), h("ul", null, fehlt.map(x => h("li", null, x)))));
+    }
+    box.append(h("details", null, h("summary", null, "Musterlösung"), h("p", { style: "margin-top:8px" }, f.muster)));
+    if (f.erklaerung && !f.erklaerung.startsWith("Vergleiche")) box.append(h("p", null, f.erklaerung));
+    box.append(h("div", { class: "row" }, h("button", { class: "btn ghost", type: "button", onclick: () => kopiere(claudeText(f, erg.gegeben)) }, "Mit Claude besprechen")));
+  } else box.append(h("p", null, f.erklaerung));
+  if (f.hinweis) box.append(h("p", { class: "hint" }, "Hinweis: " + f.hinweis));
+  if (f.quelle) box.append(h("p", { class: "src" }, "Quelle: " + f.quelle));
+  return box;
+}
+
+/* ---------- Freitext: Selbstbewertung mit Kernpunkten ---------- */
+function claudeText(f, text) {
+  return ["Bitte bewerte meine Übungsantwort aus der HBOD-Lern-App. Sag mir in einfachen Worten, was gut ist, was fehlt und was sachlich falsch ist.", "",
+    "Aufgabe (" + f.id.toUpperCase() + "): " + f.frage, "", "Meine Antwort:", text || "—", "", "Musterlösung:", f.muster, "", "Kernpunkte:", ...f.kernpunkte.map(k => "- " + k)].join("\n");
+}
+function kernBewertung(f, text, onSave) {
+  const sel = new Set();
+  const liste = h("div", { class: "opts" }, f.kernpunkte.map((k, i) => {
+    const id = "k-" + f.id + "-" + i;
+    const inp = h("input", { type: "checkbox", id });
+    const lab = h("label", { class: "opt", for: id }, inp, h("span", null, k));
+    inp.addEventListener("change", () => { inp.checked ? sel.add(i) : sel.delete(i); lab.classList.toggle("sel", inp.checked); });
+    return lab;
+  }));
+  return h("div", { class: "fb" },
+    h("div", { class: "verdict" }, "Vergleiche mit der Musterlösung"),
+    h("details", { open: true }, h("summary", null, "Musterlösung"), h("p", { style: "margin-top:8px" }, f.muster)),
+    h("p", null, "Welche Kernpunkte stehen sinngemäß in deiner Antwort? Hak ehrlich ab."),
+    liste,
+    f.erklaerung && !f.erklaerung.startsWith("Vergleiche") ? h("p", { class: "small" }, f.erklaerung) : null,
+    h("div", { class: "row" },
+      h("button", { class: "btn primary", type: "button", onclick: () => {
+        const anteil = sel.size / f.kernpunkte.length;
+        onSave({ punkte: anteil >= 0.8 ? 1 : anteil >= 0.4 ? 0.5 : 0, gegeben: text, kern: [...sel].sort((a, b) => a - b) });
+      } }, "Bewertung speichern"),
+      h("button", { class: "btn ghost", type: "button", onclick: () => kopiere(claudeText(f, text)) }, "Mit Claude besprechen")),
+    h("p", { class: "small muted" }, "Ab 80 % der Kernpunkte zählt die Antwort als richtig, ab 40 % als teilweise richtig."));
+}
+function bewerteText(f, card) {
+  const L = S.lauf;
+  const text = (L.eingaben[f.id] || "").trim();
+  if (text.length < 15) { toast("Schreib zuerst eine Antwort (mindestens ein, zwei Sätze)."); return; }
+  if (card.querySelector(".fb")) return;
+  const ta = card.querySelector("textarea"); if (ta) ta.disabled = true;
+  for (const b of card.querySelectorAll(".actions .btn.primary")) b.disabled = true;
+  const box = kernBewertung(f, text, (erg) => { L.ergebnisse[f.id] = erg; speichereAntwort(f, erg); render(); });
+  card.insertBefore(box, card.querySelector(".note-box"));
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+/* ---------- Abgabe im Prüfungsmodus ---------- */
+function abgeben() {
+  const L = S.lauf;
+  const offen = L.qids.filter(q => L.eingaben[q] == null || L.eingaben[q] === "");
+  if (offen.length && !L.bestaetigt) {
+    L.bestaetigt = true;
+    toast(offen.length + " Fragen sind noch offen. Tippe nochmal auf Abgeben, um trotzdem auszuwerten.");
+    return;
+  }
+  for (const qid of L.qids) {
+    const f = S.fragen[qid]; const w = eingabeVon(f);
+    if (f.typ === "text") {
+      const text = (w || "").trim();
+      if (!text) { L.ergebnisse[qid] = { punkte: 0, gegeben: "—" }; speichereAntwort(f, L.ergebnisse[qid]); }
+      else L.ergebnisse[qid] = { punkte: 0, gegeben: text, selbst: true };
+      continue;
+    }
+    L.ergebnisse[qid] = bewerte(f, w);
+    speichereAntwort(f, L.ergebnisse[qid]);
+  }
+  abschluss();
+}
+
+function abschluss() {
+  const L = S.lauf;
+  let punkte = 0;
+  for (const q of L.qids) punkte += (L.ergebnisse[q] && !L.ergebnisse[q].selbst ? L.ergebnisse[q].punkte : 0);
+  L.punkte = punkte; L.ende = nowIso();
+  const key = L.art === "test" && L.qids.length === S.tests[L.tid].fragen.length ? L.tid : L.art === "pruefung" ? "pruefungen" : L.art === "heute" ? "tagesrunden" : null;
+  if (key) {
+    const eintrag = { datum: L.ende, punkte, max: L.qids.length, modus: L.modus };
+    if (L.art === "pruefung") eintrag.fragen = L.qids.slice();
+    (S.laeufe[key] = S.laeufe[key] || []).push(eintrag);
+    S.outbox.laeufe[key] = S.laeufe[key];
+  }
+  // Der Durchgang ist abgeschlossen: auf anderen Geräten nicht mehr als "angefangen" anzeigen
+  S.laufZeit = nowIso(); S.outbox.lauf = { daten: null, zeit: S.laufZeit };
+  planeSync(300);
+  location.hash = "ergebnis";
+  if (S.ansicht === "ergebnis") render();
+}
+
+function viewErgebnis() {
+  const L = S.lauf;
+  const max = L.qids.length;
+  let p = 0; for (const q of L.qids) p += (L.ergebnisse[q] && !L.ergebnisse[q].selbst ? L.ergebnisse[q].punkte : 0);
+  const quote = p / max;
+  const ok = quote >= (S.daten.bestehen_ab || 0.8);
+  const falsche = L.qids.filter(q => !L.ergebnisse[q] || L.ergebnisse[q].punkte < 1);
+  const selbst = L.qids.filter(q => L.ergebnisse[q] && L.ergebnisse[q].selbst);
+  return h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Auswertung"), h("h1", null, L.titel)),
+    h("div", { class: "panel stack" },
+      h("div", { class: "row" },
+        h("div", null, h("div", { class: "result-big" }, pct(p, max) + " %"), h("div", { class: "small muted mono" }, fmtNum(p, p % 1 ? 1 : 0) + " von " + max + " Punkten")),
+        h("span", { class: "spacer" }),
+        L.art === "heute" ? h("span", { class: "chip acc", style: "font-size:0.95rem;padding:6px 12px" }, "Tagesrunde geschafft") : h("span", { class: "chip " + (ok ? "ok" : "bad"), style: "font-size:0.95rem;padding:6px 12px" }, ok ? "Bestanden" : "Noch nicht bestanden")),
+      h("div", { class: "bar" }, L.qids.map(q => h("i", { class: L.ergebnisse[q] ? (L.ergebnisse[q].selbst ? "acc" : L.ergebnisse[q].punkte >= 1 ? "ok" : L.ergebnisse[q].punkte > 0 ? "part" : "bad") : "bad", style: "width:" + (100 / max) + "%" }))),
+      selbst.length ? h("p", { class: "hint" }, selbst.length + (selbst.length === 1 ? " Freitext wartet" : " Freitexte warten") + " noch auf deine Selbstbewertung. Öffne sie unten und hak die Kernpunkte ab.") : null,
+      h("div", { class: "actions" },
+        falsche.length ? h("button", { class: "btn primary", type: "button", onclick: () => starteLauf({ art: "fehler", tid: L.art === "test" ? L.tid : null, titel: L.titel + " – Fehler", qids: falsche, modus: "lernen" }) }, falsche.length + " Fehler üben") : null,
+        L.art === "heute" ? h("button", { class: "btn", type: "button", onclick: starteTagesrunde }, "Noch eine Runde") : h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: L.art, tid: L.tid, titel: L.titel, qids: L.qids.slice(), modus: L.modus }) }, "Nochmal"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => kopiereLauf(L) }, "Für Claude kopieren"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => go("heute") }, "Fertig"))),
+    h("h3", null, "Alle Fragen im Überblick"),
+    h("div", { class: "review" }, L.qids.map((q, i) => {
+      const f = S.fragen[q]; const e = L.ergebnisse[q] || { punkte: 0, gegeben: "—" };
+      const cls = e.selbst ? "" : e.punkte >= 1 ? "ok" : e.punkte > 0 ? "part" : "bad";
+      return h("details", { class: "review-item " + cls, open: e.punkte < 1 || e.selbst },
+        h("summary", null, h("span", { class: "mono small" }, (i + 1) + ". " + q.toUpperCase() + " "), f.frage),
+        h("p", { class: "small" }, h("b", null, "Deine Antwort: "), e.gegeben || "—"),
+        f.typ !== "text" ? h("p", { class: "small" }, h("b", null, "Lösung: "), loesungText(f)) : null,
+        e.selbst ? kernBewertung(f, e.gegeben, (erg) => { L.ergebnisse[q] = erg; speichereAntwort(f, erg); render(); }) : feedbackBox(f, e));
+    })));
+}
+
+/* ================= Fehler üben & Prüfung ================= */
+function viewFehler() {
+  const liste = [];
+  for (const q of S.reihenfolge) { const a = S.antworten[q]; if (a && a.punkte < 1) liste.push(q); }
+  const unsicher = S.reihenfolge.filter(q => { const a = S.antworten[q]; return a && a.punkte >= 1 && a.unsicher; });
+  const box = h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Wiederholen"), h("h1", null, "Fehler üben"),
+      h("p", { class: "muted" }, "Hier landen alle Fragen, die du zuletzt falsch oder nur teilweise richtig hattest. Sobald du sie richtig beantwortest, verschwinden sie aus der Liste.")));
+  if (!liste.length && !unsicher.length) { box.append(h("div", { class: "panel empty" }, "Gerade gibt es nichts zu wiederholen.")); return box; }
+  const proTest = {}; for (const q of liste) (proTest[S.testVon[q]] = proTest[S.testVon[q]] || []).push(q);
+  box.append(h("div", { class: "panel stack" },
+    h("p", null, h("b", { class: "mono" }, liste.length), " falsche Fragen aus ", h("b", { class: "mono" }, Object.keys(proTest).length), " Tests" + (unsicher.length ? ", dazu " + unsicher.length + " richtig, aber unsicher." : ".")),
+    h("div", { class: "actions" },
+      liste.length ? h("button", { class: "btn primary", type: "button", onclick: () => starteLauf({ art: "fehler", titel: "Fehler üben (gemischt)", qids: shuffled(liste, Date.now() % 99991), modus: "lernen" }) }, "Alle gemischt üben") : null,
+      unsicher.length ? h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "fehler", titel: "Unsichere Fragen", qids: shuffled(unsicher, Date.now() % 99991), modus: "lernen" }) }, unsicher.length + " unsichere üben") : null)));
+  box.append(h("div", { class: "stack" }, Object.entries(proTest).map(([tid, qs]) => h("div", { class: "panel row" },
+    h("span", { class: "tag" }, tid.toUpperCase()), h("span", { style: "flex:1;min-width:0" }, S.tests[tid].titel),
+    h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "fehler", tid, titel: S.tests[tid].titel + " – Fehler", qids: qs, modus: "lernen" }) }, qs.length + " üben")))));
+  return box;
+}
+
+function viewPruefung() {
+  const alle = []; const texte = [];
+  for (const q of S.reihenfolge) (S.fragen[q].typ === "text" ? texte : alle).push(q);
+  const laeufe = S.laeufe.pruefungen || [];
+  const starte = (n, nText) => {
+    const seed = Date.now() % 1000003;
+    const qids = shuffled(alle, seed).slice(0, n - nText).concat(shuffled(texte, seed + 7).slice(0, nText));
+    starteLauf({ art: "pruefung", titel: "Prüfungssimulation (" + n + " Fragen)", qids: shuffled(qids, seed + 3), modus: "pruefung" });
+  };
+  return h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Wie beim Führerschein"), h("h1", null, "Prüfungssimulation"),
+      h("p", { class: "muted" }, "Zufällige Fragen aus allen Modulen. Du siehst erst am Ende, was richtig war. Bestanden ab 80 %. Gut als Abschlusstest, wenn die Tagesrunden sitzen.")),
+    weiterPanel(),
+    h("div", { class: "panel stack" },
+      h("div", { class: "actions" },
+        h("button", { class: "btn primary", type: "button", onclick: () => starte(30, 2) }, "30 Fragen (mit 2 Freitexten)"),
+        h("button", { class: "btn", type: "button", onclick: () => starte(15, 0) }, "Kurz: 15 Fragen"),
+        h("button", { class: "btn", type: "button", onclick: () => starte(60, 4) }, "Lang: 60 Fragen"))),
+    laeufe.length ? h("div", { class: "panel stack" }, h("h3", null, "Bisherige Prüfungen"),
+      h("div", { class: "stack small" }, laeufe.slice(-8).reverse().map(l => h("div", { class: "row" }, h("span", { class: "mono" }, fmtDate(l.datum)), h("span", { class: "spacer" }), h("span", { class: "chip " + (l.punkte / l.max >= 0.8 ? "ok" : "bad") }, pct(l.punkte, l.max) + " % von " + l.max)))))
+      : null);
+}
+
+/* ================= Notizen & Fehler melden ================= */
+function notizId() { const b = new Uint8Array(6); crypto.getRandomValues(b); return "n" + Date.now().toString(36) + [...b].map(x => x.toString(36)).join("").slice(0, 8); }
+function speichereNotiz(n) {
+  const id = notizId(); n.id = id; n.zeit = nowIso();
+  S.notizen[id] = n; S.outbox.notizen[id] = n; planeSync(500);
+  toast(S.code ? "Notiz gespeichert." : "Notiz auf diesem Gerät gespeichert. Verbinde deine Geräte, damit sie überall da ist.");
+}
+function setzeNotizStatus(n, status) { const neu = Object.assign({}, n, { status, zeit: nowIso() }); S.notizen[n.id] = neu; S.outbox.notizen[n.id] = neu; planeSync(500); render(); }
+function notizLink(f, tid) {
+  const wrap = h("div", { class: "note-box" });
+  const btn = h("button", { class: "linkbtn", type: "button" }, "Fehler gefunden oder etwas ergänzen?");
+  btn.addEventListener("click", () => {
+    btn.hidden = true;
+    const ta = h("textarea", { rows: 3, placeholder: "Was stimmt nicht oder was sollte ergänzt werden? Gern mit Quelle." });
+    const save = h("button", { class: "btn", type: "button" }, "Notiz speichern");
+    save.addEventListener("click", () => {
+      const text = ta.value.trim(); if (!text) { toast("Bitte kurz beschreiben."); return; }
+      speichereNotiz({ art: "frage", frage_id: f.id, test: tid, frage: f.frage.slice(0, 200), text, datum: nowIso(), status: "offen" });
+      wrap.replaceChildren(h("p", { class: "small muted" }, "Danke, ist notiert."));
+    });
+    wrap.append(ta, h("div", { class: "row" }, save, h("button", { class: "btn ghost", type: "button", onclick: () => { wrap.replaceChildren(btn); btn.hidden = false; } }, "Abbrechen")));
+    ta.focus();
+  });
+  wrap.append(btn);
+  return wrap;
+}
+function notizenText() {
+  const alle = Object.values(S.notizen).sort((a, b) => (a.datum < b.datum ? -1 : 1));
+  return ["Notizen aus der HBOD Lern-App (Fragenkatalog " + S.daten.version + ")", ""].concat(alle.map(n => "[" + (n.status || "offen") + "] " + String(n.datum || "").slice(0, 10) + " " + (n.frage_id ? n.frage_id.toUpperCase() + " (" + n.frage + ") " : "") + "– " + n.text)).join("\n");
+}
+function viewNotizen() {
+  const alle = Object.values(S.notizen).sort((a, b) => (a.datum < b.datum ? 1 : -1));
+  const ta = h("textarea", { rows: 4, id: "neue-notiz", placeholder: "Neue Erkenntnis, z. B. \"Laut Laurin gilt bei OTTO ab 2027 eine neue Provision …\"" });
+  const save = h("button", { class: "btn primary", type: "button" }, "Speichern");
+  save.addEventListener("click", () => {
+    const text = ta.value.trim(); if (!text) { toast("Bitte etwas eintragen."); return; }
+    speichereNotiz({ art: "erkenntnis", text, datum: nowIso(), status: "offen" });
+    render();
+  });
+  const offen = alle.filter(n => n.status !== "erledigt").length;
+  return h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Für Claude"), h("h1", null, "Notizen und neue Erkenntnisse"),
+      h("p", { class: "muted" }, "Notiere hier, was neu ist oder nicht stimmt. Gib die Notizen dann Claude im Projekt HBOD, z. B. mit \"Arbeite meine Notizen aus der Lern-App ein\" und dem kopierten Text oder dem Bericht-Link.")),
+    h("div", { class: "panel stack" }, h("label", { for: "neue-notiz", class: "label" }, "Neue Erkenntnis"), ta, h("div", { class: "row" }, save)),
+    alle.length ? h("div", { class: "row" }, h("span", { class: "small muted" }, offen + " offen, " + (alle.length - offen) + " erledigt"), h("span", { class: "spacer" }), h("button", { class: "btn ghost", type: "button", onclick: () => kopiere(notizenText()) }, "Alle Notizen kopieren")) : null,
+    alle.length ? h("div", { class: "notes" }, alle.map(n => h("div", { class: "note" },
+      h("div", { class: "row small muted" }, h("span", { class: "mono" }, fmtDate(n.datum)), n.frage_id ? h("span", { class: "tag" }, n.frage_id.toUpperCase()) : h("span", { class: "chip acc" }, "Erkenntnis"), h("span", { class: "spacer" }),
+        h("button", { class: "chip" + (n.status === "erledigt" ? " ok" : ""), type: "button", style: "cursor:pointer", onclick: () => setzeNotizStatus(n, n.status === "erledigt" ? "offen" : "erledigt"), title: "Status umschalten" }, n.status === "erledigt" ? "erledigt" : "offen")),
+      n.frage ? h("p", { class: "small muted" }, n.frage) : null,
+      h("p", null, n.text))))
+      : h("div", { class: "panel empty" }, "Noch keine Notizen."));
+}
+
+/* ================= Geräte & Speicherung ================= */
+function viewGeraete() {
+  const box = h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Speichern auf allen Geräten"), h("h1", null, "Geräte verbinden"),
+      h("p", { class: "muted" }, "Dein Fortschritt wird immer zuerst auf dem Gerät gespeichert. Mit einem Lern-Code wird er zusätzlich auf dem Server gesichert und ist auf Handy und PC gleich, auch mitten in einem Test.")));
+  if (!S.code) {
+    const inp = h("input", { class: "codein", type: "text", placeholder: "XXXX-XXXX-XXXX-XXXX", autocomplete: "off", autocapitalize: "characters", spellcheck: "false", "aria-label": "Lern-Code" });
+    box.append(
+      h("div", { class: "panel stack" },
+        h("h3", null, "Erstes Gerät"),
+        h("p", { class: "small" }, "Erstelle einmal deinen persönlichen Lern-Code. Er ist wie ein Schlüssel: Wer ihn kennt, sieht deinen Fortschritt. Gib ihn nicht weiter."),
+        h("div", { class: "actions" }, h("button", { class: "btn primary", type: "button", onclick: () => verbinde(neuerCode(), true) }, "Lern-Code erstellen"))),
+      h("div", { class: "panel stack" },
+        h("h3", null, "Weiteres Gerät"),
+        h("p", { class: "small" }, "Am einfachsten öffnest du auf dem neuen Gerät den Geräte-Link vom ersten Gerät. Oder du tippst den Code hier ein."),
+        inp,
+        h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: () => { const c = normCode(inp.value); if (!CODE_RE.test(c)) { toast("Der Code hat das Format XXXX-XXXX-XXXX-XXXX."); return; } verbinde(c, false); } }, "Verbinden"))));
+  } else {
+    const st = S.sync.status;
+    box.append(
+      h("div", { class: "panel stack" },
+        h("div", { class: "row" }, h("span", { class: "label" }, "Dein Lern-Code"), h("span", { class: "spacer" }), h("span", { class: "chip " + (st === "ok" ? "ok" : st === "offline" ? "part" : st === "lokal" ? "" : "bad") }, st === "ok" ? "verbunden" : st === "offline" ? "offline" : st === "lokal" ? "verbinde …" : "Problem")),
+        h("div", { class: "codebig" }, S.code),
+        h("p", { class: "small muted" }, S.sync.zuletzt ? "Zuletzt gespeichert: " + fmtDate(S.sync.zuletzt) : "Noch nicht mit dem Server abgeglichen."),
+        st === "kein_server" ? h("p", { class: "hint" }, "Der Sync-Server antwortet nicht. Er läuft nur auf der Netlify-Seite der App. Dein Fortschritt bleibt auf diesem Gerät und wird übertragen, sobald es wieder geht.") : null,
+        h("div", { class: "actions" },
+          h("button", { class: "btn primary", type: "button", onclick: () => kopiere(geraeteLink(), "Geräte-Link kopiert. Öffne ihn auf dem anderen Gerät.") }, "Geräte-Link kopieren"),
+          h("button", { class: "btn", type: "button", onclick: async () => { await holen(); await syncJetzt(); toast(S.sync.status === "ok" ? "Abgeglichen." : "Gerade nicht möglich."); render(); } }, "Jetzt abgleichen"))),
+      h("div", { class: "panel stack" },
+        h("h3", null, "Mit Claude besprechen"),
+        h("p", { class: "small" }, "Der Bericht-Link zeigt deinen Stand, deine Fehler und deine Notizen als Text, nur zum Lesen. Gib ihn Claude in einem neuen Chat im Projekt HBOD, z. B. mit: \"Lies meinen Lern-Bericht und lass uns die Fehler durchgehen.\""),
+        h("div", { class: "actions" },
+          h("button", { class: "btn", type: "button", disabled: !S.lesetoken, onclick: () => kopiere(berichtLink(), "Bericht-Link kopiert.") }, "Bericht-Link kopieren"),
+          h("button", { class: "btn ghost", type: "button", onclick: () => kopiere(gesamtText()) }, "Bericht als Text kopieren"))),
+      resetPanel());
+  }
+  box.append(h("div", { class: "panel stack" },
+    h("h3", null, "Als App installieren"),
+    h("p", { class: "small" }, "iPhone: In Safari auf Teilen und dann \"Zum Home-Bildschirm\". Android und PC: im Browser-Menü \"App installieren\" oder \"Zum Startbildschirm hinzufügen\". Danach startet die Lern-App wie eine normale App und funktioniert auch ohne Internet. Änderungen werden nachgeholt."),
+    S.installPrompt ? h("div", { class: "actions" }, h("button", { class: "btn", type: "button", onclick: async () => { const p = S.installPrompt; S.installPrompt = null; try { await p.prompt(); } catch (e) {} render(); } }, "Jetzt installieren")) : null));
+  return box;
+}
+function resetPanel() {
+  return h("details", null, h("summary", null, "Weitere Einstellungen"),
+    h("div", { class: "stack", style: "margin-top:10px" },
+      h("p", { class: "small" }, "Code auf diesem Gerät entfernen: Der Fortschritt bleibt auf dem Server und auf diesem Gerät, wird hier aber nicht mehr abgeglichen."),
+      h("div", { class: "actions" }, h("button", { class: "btn ghost", type: "button", onclick: () => { S.code = null; S.lesetoken = null; S.sync.status = "lokal"; lsSave(); renderStatus(); render(); toast("Code von diesem Gerät entfernt."); } }, "Code entfernen")),
+      h("p", { class: "small" }, "Fortschritt zurücksetzen: Alle Antworten und Durchgänge werden auf allen Geräten gelöscht. Notizen bleiben."),
+      h("div", { class: "actions" }, h("button", { class: "btn danger", type: "button", onclick: async () => {
+        if (!S.resetBereit) { S.resetBereit = true; toast("Wirklich alles zurücksetzen? Tippe zur Bestätigung noch einmal."); setTimeout(() => { S.resetBereit = false; }, 6000); return; }
+        S.resetBereit = false;
+        S.antworten = {}; S.laeufe = {}; S.aktivitaet = {}; S.lauf = null; S.laufZeit = ""; S.ueberarbeitet.clear();
+        Object.assign(S.outbox, { antworten: {}, laeufe: {}, aktivitaet: {}, lauf: null });
+        await syncJetzt({ zuruecksetzen: true }); render(); toast("Fortschritt zurückgesetzt.");
+      } }, "Fortschritt zurücksetzen"))));
+}
+
+/* ================= Kopieren für Claude ================= */
+function textBlock(titel, qids, ergebnisse) {
+  const zeilen = ["HBOD Lern-App – " + titel, "Fragenkatalog " + S.daten.version + " (" + S.daten.stand + ")", ""];
+  let p = 0, n = 0;
+  for (const q of qids) {
+    const f = S.fragen[q]; const e = (ergebnisse && ergebnisse[q]) || S.antworten[q];
+    n++;
+    zeilen.push(q.toUpperCase() + " [" + TYPNAME[f.typ] + "] " + f.frage);
+    if (!e) { zeilen.push("  Nicht beantwortet."); zeilen.push(""); continue; }
+    p += e.selbst ? 0 : (e.punkte || 0);
+    zeilen.push("  Meine Antwort: " + (e.gegeben || "—") + (e.unsicher ? " (unsicher)" : ""));
+    zeilen.push("  Bewertung: " + (e.selbst ? "noch nicht bewertet" : e.punkte >= 1 ? "richtig" : e.punkte > 0 ? "teilweise" : "falsch"));
+    if (f.typ !== "text" && e.punkte < 1) zeilen.push("  Lösung: " + loesungText(f));
+    zeilen.push("");
+  }
+  zeilen.splice(2, 0, "Ergebnis: " + fmtNum(p, p % 1 ? 1 : 0) + " von " + n + " (" + pct(p, n) + " %)");
+  return zeilen.join("\n");
+}
+function gesamtText() {
+  const g = gesamtStats();
+  const z = ["HBOD Lern-App – Gesamtstand", "Fragenkatalog " + S.daten.version + " (" + S.daten.stand + ")",
+    g.beantwortet + " von " + g.gesamt + " beantwortet, " + g.richtig + " richtig, " + g.meister + " gemeistert, " + serie() + " Tage in Folge.", ""];
+  for (const t of S.daten.tests) { const s = testStats(t); if (s.beantwortet) z.push(t.id.toUpperCase() + " " + t.titel + ": " + s.beantwortet + "/" + s.gesamt + ", " + pct(s.punkte, s.gesamt) + " %"); }
+  const falsch = S.reihenfolge.filter(q => S.antworten[q] && S.antworten[q].punkte < 1);
+  if (falsch.length) { z.push("", textBlock("Fragen, die noch nicht sitzen", falsch)); }
+  if (Object.keys(S.notizen).length) z.push("", notizenText());
+  return z.join("\n");
+}
+async function kopiere(text, meldung) {
+  try { await navigator.clipboard.writeText(text); toast(meldung || "Kopiert. Füge es im Chat mit Claude ein."); }
+  catch (e) {
+    const ta = h("textarea", { class: "copyarea", readonly: true }); ta.value = text;
+    $("#app").prepend(h("div", { class: "panel stack", style: "margin-top:16px" }, h("p", null, "Kopieren ging nicht automatisch. Markiere den Text und kopiere ihn selbst:"), ta));
+    ta.focus(); ta.select(); window.scrollTo({ top: 0 });
+  }
+}
+function kopiereTest(tid) { const t = S.tests[tid]; kopiere(textBlock(t.id.toUpperCase() + " " + t.titel, t.fragen.map(f => f.id))); }
+function kopiereLauf(L) { kopiere(textBlock(L.titel + " (" + (L.modus === "pruefung" ? "Prüfungsmodus" : "Lernmodus") + ")", L.qids, L.ergebnisse)); }
+
+/* ================= Hilfe ================= */
+function viewHilfe() {
+  return h("section", { class: "stack" },
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "So funktioniert es"), h("h1", null, "Hilfe")),
+    h("div", { class: "panel prose" },
+      h("h3", null, "So lernst du am besten"),
+      h("ul", null,
+        h("li", null, "Jeden Tag eine Tagesrunde unter \"Heute\". Kurz und regelmäßig bringt mehr als selten und lang."),
+        h("li", null, "Erst selbst antworten, dann die Lösung ansehen. Das Abrufen aus dem Kopf festigt Wissen am stärksten."),
+        h("li", null, "Wenn du rätst, hak \"Ich bin unsicher\" an. Dann kommt die Frage öfter, bis sie sicher sitzt."),
+        h("li", null, "Lies bei Fehlern die Erklärung und erkläre sie dir in eigenen Worten. Der Lernzettel eines Tests hilft dabei."),
+        h("li", null, "Die Tagesrunde mischt Themen. Das ist anstrengender, aber du lernst dabei, Begriffe sauber zu unterscheiden."),
+        h("li", null, "Wenn die Tagesrunden gut laufen, mach eine Prüfungssimulation als Gesamtprobe.")),
+      h("h3", null, "Wiederholungsplan"),
+      h("ul", null,
+        h("li", null, "Jede Frage liegt in einem von fünf Fächern. Richtig: ein Fach weiter. Falsch: zurück in Fach 1."),
+        h("li", null, "Fach 1 kommt nach 1 Tag wieder, Fach 2 nach 3, Fach 3 nach 7, Fach 4 nach 14 und Fach 5 nach 30 Tagen."),
+        h("li", null, "Gemeistert heißt: an mindestens drei verschiedenen Tagen richtig. Mehrmals am selben Tag zählt nur einmal.")),
+      h("h3", null, "Speichern"),
+      h("ul", null,
+        h("li", null, "Alles wird sofort auf dem Gerät gespeichert, auch ohne Internet."),
+        h("li", null, "Mit einem Lern-Code (unter \"Geräte\") wird alles zusätzlich auf dem Server gesichert und ist auf jedem Gerät gleich, sogar ein angefangener Test.")),
+      h("h3", null, "Freitext und E-Mails"),
+      h("ul", null,
+        h("li", null, "Schreib deine Antwort, vergleiche mit der Musterlösung und hak ab, welche Kernpunkte du drin hast."),
+        h("li", null, "\"Mit Claude besprechen\" kopiert Aufgabe, deine Antwort und die Musterlösung, damit du sie Claude in einem Chat geben kannst.")),
+      h("h3", null, "Erweitern und korrigieren"),
+      h("ul", null,
+        h("li", null, "Fehler unter der Frage melden oder neue Erkenntnisse unter \"Notizen\" eintragen."),
+        h("li", null, "Claude arbeitet Notizen und neue Dokumente in den Fragenkatalog ein und lädt die neue Version zu GitHub hoch. Überarbeitete Fragen zählen danach neu, alles andere bleibt erhalten.")),
+      h("h3", null, "Wichtig"),
+      h("ul", null,
+        h("li", null, "Fragen mit Hinweis beruhen auf Gesprächsaufnahmen oder Annahmen. Bevor du sie Kunden gegenüber nutzt, kurz im Team prüfen."),
+        h("li", null, "Steuer- und Rechtsfragen sind zum Verstehen gedacht und keine Rechtsberatung."))),
+    h("div", { class: "panel stack" },
+      h("h3", null, "Was ist neu"),
+      (S.daten.aenderungen || []).map(a => h("div", { class: "stack small" }, h("b", null, "Version " + a.version + " · " + new Date(a.datum).toLocaleDateString("de-DE")), h("ul", { style: "margin:0;padding-left:1.2em;display:grid;gap:4px" }, a.punkte.map(p => h("li", null, p))))),
+      h("p", { class: "small muted" }, "Fragenkatalog Version " + S.daten.version + ", Stand " + new Date(S.daten.stand).toLocaleDateString("de-DE") + ".")));
+}
+
+/* ================= Start ================= */
+async function ladeDaten() {
+  try {
+    const r = await fetch("/fragen.json", { cache: "no-cache" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    indexDaten(await r.json());
+    return true;
+  } catch (e) {
+    $("#app").replaceChildren(h("div", { class: "panel empty", style: "margin-top:20px" }, "Der Fragenkatalog konnte nicht geladen werden. ", h("button", { class: "btn", type: "button", onclick: () => location.reload() }, "Neu laden")));
+    return false;
+  }
+}
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); S.installPrompt = e; if (S.ansicht === "geraete") render(); });
+async function start() {
+  lsLoad();
+  renderStatus();
+  if (!(await ladeDaten())) return;
+  bereinige();
+  fromHash();
+  if (S.code) { await holen(); }
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    try { await navigator.serviceWorker.register("/sw.js"); } catch (e) {}
+  }
+}
+start();
+})();
+</script>
+</body>
+</html>

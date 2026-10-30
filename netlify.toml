@@ -1,0 +1,24 @@
+# Netlify: statische Seite aus "public", Sync-Funktionen aus "netlify/functions"
+[build]
+  publish = "public"
+  command = "echo 'Kein Build nötig: fragen.json liegt fertig in public/'"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/fragen.json"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "same-origin"
