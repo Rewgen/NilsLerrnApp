@@ -89,7 +89,7 @@ thema("retouren", "Zahlen und Kalkulation", "Retouren",
       "Bestandskunden-Call (Sprache_001), Gespräch Retoure, Einweisung Produktkalkulation, Monatsreport-Gespräch, Preisliste 10/2026",
       "t04-02 t04-03 t12-12 t16-01 t16-02 t16-03 t16-04 t16-05 t16-06 t16-07 t16-08 t16-09 "
       "t16-10 t16-11 t16-12 t16-13 t16-14 t07-05 t21-04 t19-05 t19-06 t19-10 t19-11 t22-06 "
-      "t18-04 t25-08 t28-07 t30-08",
+      "t18-04 t25-08 t30-08",
       "Die Retourenquoten sind Richtwerte aus Gesprächsaufnahmen. Das Verhältnis von 70 % zu 5 % intern bestätigen.")
 
 thema("auszahlung", "Zahlen und Kalkulation", "Auszahlung und Auszahlungsquote",
@@ -117,7 +117,7 @@ thema("preisliste", "Zahlen und Kalkulation", "Die Preisliste: Was kostet was?",
       "In Mails: sehr gute DHL-Konditionen durch unser Volumen, nie „Logistik zu unseren Kosten“.",
       "Preisliste 10/2026, Einweisung Produktkalkulation, Deine Mail-Regeln",
       "t13-01 t13-02 t09-01 t09-02 t13-03 t09-03 t09-04 t09-05 t09-06 t09-07 t13-04 t13-05 "
-      "t13-06 t13-07 t13-08 t13-09 t13-10 t09-11 t13-11 t08-08 t03-11 t06-08 t28-01 t28-12 t29-14")
+      "t13-06 t13-07 t13-08 t13-09 t13-10 t09-11 t08-08 t03-11 t06-08 t28-01 t28-12 t29-14")
 
 thema("preise-marge", "Zahlen und Kalkulation", "Preise, UVP und Marge",
       "Wer den Preis bestimmt, was UVP und MPE unterscheidet und wie Marge, Aufschlag und Faktor zusammenhängen.",
@@ -171,7 +171,7 @@ thema("artikeldaten", "HBOD und Abläufe", "EAN, SKU und Stammdaten",
        "Die Maße bestimmen die Lagerkosten. Bei Textilien muss die Faserzusammensetzung am Produkt und im Angebot stehen."],
       "Eine Farbe in einer Größe = ein Kindartikel = eine EAN.",
       "Deine Zusammenfassung (Glossar), Allgemeinwissen, Bestandskunden-Call (Sprache_001), Brand Info",
-      "t03-01 t03-02 t03-03 t03-04 t03-05 t03-06 t03-07 t03-08 t03-09 t12-08 t03-10 t03-12 "
+      "t03-01 t03-02 t03-03 t03-04 t03-05 t03-06 t03-07 t03-08 t03-09 t03-10 t03-12 "
       "t03-13 t03-14 t18-06 t24-07 t03-11 t10-02")
 
 thema("bestand-saison", "HBOD und Abläufe", "Bestand, Saison und Peak Season",
@@ -198,7 +198,7 @@ thema("account-health", "HBOD und Abläufe", "SLAs, Account Health und eigenes L
        "Die BuyBox hängt an Preis, Lieferzeit, Verfügbarkeit, Verkäuferqualität und Prime. Die Abteilung Account Health überwacht die SLAs und löst Sperren."],
       "„Da wir selbst als Verkäufer auftreten und an die SLAs gebunden sind, benötigen wir die Kontrolle über das Fulfillment.“",
       "Einarbeitung Marktplatz-Integration, Laurins Mail an Maag, Bestandskunden-Call (Sprache_001), Allgemeinwissen Amazon Seller Central",
-      "t04-06 t07-09 t07-10 t12-05 t12-07 t12-06 t02-10 t26-09 t28-04 t04-04 t04-05 t07-02 t09-12",
+      "t04-06 t07-09 t07-10 t12-05 t12-07 t12-06 t26-09 t28-04 t04-04 t04-05 t07-02 t09-12",
       "Amazon kann die Zielwerte ändern.")
 
 thema("werbung-aktionen", "HBOD und Abläufe", "Werbung, Aktionen und Black Friday",
@@ -255,7 +255,7 @@ thema("amazon", "Marktplätze", "Amazon",
        "Bei FBA bleibt die Marke selbst Verkäufer. HBOD verkauft dagegen im eigenen Namen auf über 40 Marktplätzen. Werbeformate: Sponsored Products, Sponsored Brands, Sponsored Display."],
       "Bei gleichem Preis zahlt Amazon oft deutlich mehr aus als Zalando, weil weniger zurückkommt.",
       "Bestandskunden-Call (Sprache_001), Einweisung Produktkalkulation, Einarbeitung Marktplatz-Integration, Allgemeinwissen Amazon Seller Central, Company Profile 2026",
-      "t04-01 t04-02 t12-12 t12-01 t04-04 t04-05 t12-05 t12-06 t03-04 t03-09 t12-08 t02-01 "
+      "t04-01 t04-02 t12-12 t12-01 t04-04 t04-05 t12-05 t12-06 t03-04 t03-09 t02-01 "
       "t10-01 t10-02 t05-01 t17-11 t32-01 t32-05",
       "Amazon kann Zielwerte ändern. Die Retourenquoten sind Richtwerte aus Gesprächen.")
 

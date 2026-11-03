@@ -1,6 +1,6 @@
 # HBOD Lern-App
 
-Lern- und Prüfungs-App für E-Commerce und HBOD: 32 Tests, gut 400 Fragen, 23 Themen zum Vertiefen, Tagesrunde mit 5 Fragen und Wiederholungsplan, schnelle Runden mit 5 oder 10 Fragen, Prüfungssimulation, Lernzettel und Notizen. Antworten lassen sich mit einem Tipp im eigenen Claude-Chat erklären. Der Fortschritt wird auf jedem Gerät gespeichert und über einen persönlichen Lern-Code zwischen Handy und PC abgeglichen.
+Lern- und Prüfungs-App für E-Commerce und HBOD: 32 Tests, gut 400 Fragen, 23 Themen zum Vertiefen, Tagesrunde mit 5 Fragen und Wiederholungsplan, schnelle Runden mit 5 oder 10 Fragen, Prüfungssimulation, Lernzettel und Notizen. Antworten lassen sich mit einem Tipp im eigenen Claude-Chat erklären. Fragen lassen sich als leicht, mittel oder schwer bewerten, anmerken (z. B. „Antwort stimmt nicht“) und neue Fragen oder Themen per Plus-Knopf wünschen. Der Fortschritt wird auf jedem Gerät gespeichert und über einen persönlichen Lern-Code zwischen Handy und PC abgeglichen.
 
 ## Einmal einrichten (Netlify)
 
@@ -39,6 +39,11 @@ inhalte/                die Quellen des Fragenkatalogs
   dsl.py                Kurzschreibweise für Fragen (S, M, W, Z, R, P, T)
   q_a.py … q_f.py       Module A bis F
   themen.py             Themen zum Vertiefen: Kurzerklärung und zugeordnete Frage-IDs
+  pflege.py             doppelte Fragen ausblenden, verwandte Fragen verknüpfen
+  rueckmeldungen.py     Claudes Antworten auf Nils' Anmerkungen (erscheinen in der App)
+  aehnlich.py           Ähnlichkeitssuche für Build, suche.py und doppelte.py
+  suche.py              prüft vor dem Einbau, ob es eine Frage oder ein Thema schon gibt
+  doppelte.py           zeigt sehr ähnliche Fragenpaare und ihren Stand
   build.py              baut public/fragen.json und enthält die Liste "Was ist neu"
 werkzeuge/lokal.mjs     lokaler Testserver mit Speicher im Arbeitsspeicher
 ```
@@ -69,8 +74,10 @@ npm run lokal        # http://localhost:8888, Sync mit Speicher im Arbeitsspeich
 ## Lernmethode in der App
 
 - **Abrufen statt Wiederlesen:** Jede Frage wird erst beantwortet, dann kommt die Erklärung.
-- **Verteiltes Wiederholen (Leitner, 5 Fächer):** richtig, dann nach 1, 3, 7, 14 und 30 Tagen wieder; falsch, dann am nächsten Tag. Richtig vor dem Termin (gleicher Tag, schnelle Runde, Test nochmal) lässt Fach und Termin unverändert. Gemeistert ab Fach 3, also dreimal zum Termin richtig.
-- **Tagesrunde:** standardmäßig 5 Fragen (einstellbar 5, 10, 15 oder 20), zuerst Fälliges, dann Neues.
+- **Verteiltes Wiederholen (Leitner, 5 Fächer):** richtig, dann nach 2, 4, 8, 15 und 30 Tagen wieder (bis Version 2.2: 1, 3, 7, 14, 30); falsch, dann am nächsten Tag. Richtig vor dem Termin (gleicher Tag, schnelle Runde, Test nochmal) lässt Fach und Termin unverändert. Gemeistert ab Fach 3, also dreimal zum Termin richtig.
+- **Tagesrunde:** standardmäßig 5 Fragen (einstellbar 5, 10, 15 oder 20). Höchstens 60 % sind Wiederholungen (bei 5 Fragen 3), der Rest ist neu. Dieselbe Frage kommt nicht zweimal am selben Tag, verwandte Fragen (gleiche Tatsache, siehe `pflege.py`) nie in derselben Runde oder am selben Tag. Gilt auch für schnelle Runden, Themen und Prüfung.
+- **Bewertung:** Nach jeder Antwort Leicht, Mittel oder Schwer. Schwer hält die Frage in Fach 1 oder 2 (direkt nach dem Bewerten morgen wieder), Leicht lässt sie zum Termin ein Fach mehr aufsteigen. „Nur schwere lernen“ unter Heute, Fehler und im Thema.
+- **Anmerken und Wünsche:** Unter jeder Frage „Anmerken“ (Antwort stimmt nicht, unklar, doppelt, Ergänzung; auf Wunsch pausiert die Frage bis zur Prüfung). Der Plus-Knopf öffnet ein Fenster für neue Fragen, Themen oder Erkenntnisse und zeigt sofort ähnliche vorhandene Fragen. Claude arbeitet alles ein und antwortet über `inhalte/rueckmeldungen.py`. Die Antwort erscheint an der Notiz, die Notiz gilt dann als erledigt.
 - **Themen vertiefen:** 23 Themen (z. B. GMV und Kennzahlen, Provision, Retouren, Zalando, EPR) mit Kurzerklärung und Merksatz. Gelernt wird in Runden zu 5 Fragen: zuerst Fälliges und Fehler aus dem Thema, dann neue Fragen in der Lernreihenfolge des Themas. Heute schon Beantwortetes kommt nach hinten, damit „Nächste 5 Fragen“ weiterführt. Unter jeder Erklärung führt „Thema vertiefen“ zum passenden Thema.
 - **Schnelle Runde:** 5 oder 10 Fragen ohne Freitext, aus allen Themen, einem Modul oder einem Test. Reihenfolge der Auswahl: fällig, zuletzt falsch, neu (reihum aus verschiedenen Tests), am längsten her. Mit Serie für richtige Antworten in Folge.
 - **Am PC:** Tasten 1 bis 9 wählen eine Antwort, Enter prüft und geht weiter.

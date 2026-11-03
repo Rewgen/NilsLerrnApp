@@ -43,7 +43,7 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 h1, h2, h3 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; margin: 0; line-height: 1.15; }
 h1 { font-size: 1.6rem; } h2 { font-size: 1.35rem; } h3 { font-size: 1.1rem; }
@@ -198,7 +198,7 @@ details summary { cursor: pointer; font-weight: 600; }
 .prose { display: grid; gap: 10px; max-width: 65ch; }
 .prose ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
 .codebig { font-family: var(--font-mono); font-size: 1.35rem; letter-spacing: 0.04em; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--surface-2); word-break: break-all; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 999px; font-size: 0.9rem; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(84px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 999px; font-size: 0.9rem; z-index: 20; max-width: calc(100% - 32px); text-align: center; }
 .copyarea { width: 100%; min-height: 160px; font-family: var(--font-mono); font-size: 0.8rem; }
 .empty { padding: 30px 18px; text-align: center; color: var(--muted); }
 .seg-ctl { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
@@ -222,6 +222,34 @@ a.btn.primary { color: var(--accent-ink); }
 .chatitem .url { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chatitem .row { grid-column: 2; grid-row: 1 / 3; }
 .btn.klein { min-height: 36px; padding: 6px 10px; font-size: 0.85rem; }
+.fab { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); font-size: 2rem; line-height: 1; cursor: pointer; z-index: 15; box-shadow: 0 4px 14px color-mix(in srgb, var(--ink) 30%, transparent); display: grid; place-items: center; padding: 0 0 3px; }
+.fab:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+dialog#dlg { border: 1px solid var(--line); border-radius: 14px; padding: 0; width: min(560px, calc(100% - 24px)); max-height: calc(100dvh - 32px); background: var(--surface); color: var(--ink); box-shadow: 0 20px 50px rgba(0,0,0,.3); }
+dialog#dlg::backdrop { background: rgba(15, 21, 28, .45); }
+.dlg-in { padding: 16px 18px 18px; display: grid; gap: 10px; }
+.dlg-kopf { display: flex; align-items: center; gap: 10px; }
+.dlg-kopf h2 { flex: 1; font-size: 1.25rem; }
+.dlg-zu { border: 0; background: none; font-size: 1.6rem; line-height: 1; cursor: pointer; color: var(--muted); width: 40px; height: 40px; border-radius: 8px; }
+.dlg-zu:hover { background: var(--surface-2); }
+.dlg-in input[type=text] { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; }
+.typwahl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.typwahl button { display: grid; gap: 2px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 9px 11px; cursor: pointer; min-height: 52px; }
+.typwahl button span { font-size: 0.78rem; color: var(--muted); line-height: 1.3; }
+.typwahl button.sel { border-color: var(--accent); background: var(--accent-soft); }
+.treffer { display: grid; gap: 6px; }
+.treffer-i { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-2); font-size: 0.9rem; }
+.treffer-i.sel { border-color: var(--accent); background: var(--accent-soft); }
+.treffer-i .t { flex: 1; min-width: 0; }
+.treffer-i input { margin-top: 3px; accent-color: var(--accent); flex: none; }
+.bewertung { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+.seg-ctl.stufen button { min-height: 36px; padding: 6px 14px; }
+.seg-ctl.stufen button.leicht[aria-pressed="true"] { background: var(--ok); color: var(--surface); }
+.seg-ctl.stufen button.mittel[aria-pressed="true"] { background: var(--part); color: var(--surface); }
+.seg-ctl.stufen button.schwer[aria-pressed="true"] { background: var(--bad); color: var(--surface); }
+.note.erledigt { opacity: .8; }
+.rueck { border-left: 3px solid var(--ok); background: var(--ok-soft); padding: 8px 10px; border-radius: 0 8px 8px 0; display: grid; gap: 2px; }
+.rueck .label { color: var(--ok); }
+@media (max-width: 420px) { .typwahl { grid-template-columns: 1fr; } }
 @media (max-width: 560px) {
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .stat { padding: 10px; }
@@ -238,7 +266,7 @@ a.btn.primary { color: var(--accent-ink); }
   .fb { animation: pop .18s ease-out; }
   @keyframes pop { from { transform: translateY(4px); opacity: .6; } to { transform: none; opacity: 1; } }
 }
-@media print { .top, .actions, .note-box, .claude-box, .claude-klein { display: none !important; } body { background: #fff; } }
+@media print { .top, .actions, .note-box, .claude-box, .claude-klein, .fab, .bewertung { display: none !important; } body { background: #fff; } }
 </style>
 </head>
 <body>
@@ -264,6 +292,8 @@ a.btn.primary { color: var(--accent-ink); }
   <div class="empty">Die Fragen werden geladen …</div>
 </main>
 <div class="toast" id="toast" hidden></div>
+<button class="fab" id="fab" type="button" aria-label="Hinzufügen: neue Frage, neues Thema oder Erkenntnis" title="Frage, Thema oder Erkenntnis hinzufügen">+</button>
+<dialog id="dlg" aria-labelledby="dlg-t"></dialog>
 
 <script>
 (() => {
@@ -312,16 +342,18 @@ function parseNum(str) {
 const klon = (x) => JSON.parse(JSON.stringify(x));
 const TYPNAME = { single: "Eine Antwort", multi: "Mehrere Antworten möglich", wahr: "Richtig oder falsch", zahl: "Zahl eingeben", zuordnen: "Zuordnen", reihe: "Reihenfolge", text: "Freitext" };
 // Wiederholungsplan (Leitner): Fach 1 bis 5, Abstand in Tagen bis zur nächsten Wiederholung
-const ABSTAND = [0, 1, 3, 7, 14, 30];
+// Seit 2.3: 2, 4, 8, 15, 30 Tage (vorher 1, 3, 7, 14, 30). Falsch: immer am nächsten Tag.
+const ABSTAND = [0, 2, 4, 8, 15, 30];
+const STUFEN = [["leicht", "Leicht"], ["mittel", "Mittel"], ["schwer", "Schwer"]];
 const GEMEISTERT_AB = 3;
 
 /* ================= Zustand ================= */
 const LS = "hbod-lernapp-v2";
 const API = "/api/fortschritt";
-const leereOutbox = () => ({ antworten: {}, laeufe: {}, notizen: {}, aktivitaet: {}, einstellungen: null, lauf: null });
+const leereOutbox = () => ({ antworten: {}, laeufe: {}, notizen: {}, bewertungen: {}, aktivitaet: {}, einstellungen: null, lauf: null });
 const S = {
-  daten: null, fragen: {}, testVon: {}, tests: {}, reihenfolge: [], themen: {}, themenVon: {},
-  antworten: {}, laeufe: {}, notizen: {}, aktivitaet: {}, einstellungen: { tagesziel: 5, zeit: "", chats: [] },
+  daten: null, fragen: {}, alleFragen: {}, testVon: {}, tests: {}, reihenfolge: [], themen: {}, themenVon: {}, verwandtVon: {}, verwandt: {},
+  antworten: {}, laeufe: {}, notizen: {}, bewertungen: {}, aktivitaet: {}, einstellungen: { tagesziel: 5, zeit: "", chats: [] },
   lauf: null, laufZeit: "", resetZeit: "", code: null, lesetoken: null,
   outbox: leereOutbox(), sync: { status: "lokal", zuletzt: null, busy: false, nochmal: false, letzterPull: 0 },
   ansicht: "heute", offen: null, ueberarbeitet: new Set(), installPrompt: null, resetBereit: false,
@@ -331,21 +363,29 @@ function lsLoad() {
   try {
     const d = JSON.parse(localStorage.getItem(LS) || "null");
     if (!d) return;
-    for (const k of ["antworten", "laeufe", "notizen", "aktivitaet", "einstellungen", "lauf", "laufZeit", "resetZeit", "code", "lesetoken", "outbox"]) if (d[k] != null) S[k] = d[k];
+    for (const k of ["antworten", "laeufe", "notizen", "bewertungen", "aktivitaet", "einstellungen", "lauf", "laufZeit", "resetZeit", "code", "lesetoken", "outbox"]) if (d[k] != null) S[k] = d[k];
     S.outbox = Object.assign(leereOutbox(), S.outbox || {});
     if (d.sync && d.sync.zuletzt) S.sync.zuletzt = d.sync.zuletzt;
   } catch (e) {}
 }
 function lsSave() {
   try {
-    localStorage.setItem(LS, JSON.stringify({ antworten: S.antworten, laeufe: S.laeufe, notizen: S.notizen, aktivitaet: S.aktivitaet, einstellungen: S.einstellungen,
+    localStorage.setItem(LS, JSON.stringify({ antworten: S.antworten, laeufe: S.laeufe, notizen: S.notizen, bewertungen: S.bewertungen, aktivitaet: S.aktivitaet, einstellungen: S.einstellungen,
       lauf: S.lauf, laufZeit: S.laufZeit, resetZeit: S.resetZeit, code: S.code, lesetoken: S.lesetoken, outbox: S.outbox, sync: { zuletzt: S.sync.zuletzt } }));
   } catch (e) {}
 }
 
 function indexDaten(d) {
-  S.daten = d; S.fragen = {}; S.testVon = {}; S.tests = {}; S.reihenfolge = [];
-  for (const t of d.tests) { S.tests[t.id] = t; for (const f of t.fragen) { S.fragen[f.id] = f; S.testVon[f.id] = t.id; S.reihenfolge.push(f.id); } }
+  S.daten = d; S.fragen = {}; S.alleFragen = {}; S.testVon = {}; S.tests = {}; S.reihenfolge = [];
+  // Ausgeblendete Fragen (Doppel, siehe inhalte/pflege.py) tauchen nirgends auf, bleiben aber für alte Notizen auffindbar
+  for (const t of d.tests) {
+    for (const f of t.fragen) { S.alleFragen[f.id] = f; S.testVon[f.id] = t.id; }
+    t.fragen = t.fragen.filter(f => !f.aus);
+    S.tests[t.id] = t;
+    for (const f of t.fragen) { S.fragen[f.id] = f; S.reihenfolge.push(f.id); }
+  }
+  S.verwandtVon = {}; S.verwandt = {};
+  for (const g of d.verwandt || []) { S.verwandt[g.id] = g.fragen.filter(q => S.fragen[q]); for (const q of S.verwandt[g.id]) S.verwandtVon[q] = g.id; }
   S.themen = {}; S.themenVon = {};
   for (const th of d.themen || []) {
     th.fragen = th.fragen.filter(q => S.fragen[q]);
@@ -373,16 +413,26 @@ const chats = () => (S.einstellungen && Array.isArray(S.einstellungen.chats) ? S
 function gueltig(qid, a) { const f = S.fragen[qid]; return !!(a && f && (!a.fp || !f.fp || a.fp === f.fp)); }
 function bereinige() {
   for (const [q, a] of Object.entries(S.antworten)) if (!gueltig(q, a)) { if (S.fragen[q]) S.ueberarbeitet.add(q); delete S.antworten[q]; }
-  if (S.lauf && !(S.lauf.qids || []).every(q => S.fragen[q])) { S.lauf = null; }
+  S.lauf = bereinigterLauf(S.lauf);
+}
+// Ein angefangener Durchgang bleibt erhalten, nur ausgeblendete oder entfernte Fragen fallen heraus
+function bereinigterLauf(l) {
+  if (!l || !Array.isArray(l.qids)) return null;
+  if (l.qids.every(q => S.fragen[q])) return l;
+  const aktuell = l.qids[l.idx || 0];
+  const qids = l.qids.filter(q => S.fragen[q]);
+  if (!qids.length) return null;
+  return Object.assign({}, l, { qids, idx: Math.max(0, qids.indexOf(aktuell) >= 0 ? qids.indexOf(aktuell) : Math.min(l.idx || 0, qids.length - 1)) });
 }
 
 /* ================= Synchronisation ================= */
-function outboxLeer(o = S.outbox) { return !Object.keys(o.antworten).length && !Object.keys(o.laeufe).length && !Object.keys(o.notizen).length && !Object.keys(o.aktivitaet).length && !o.einstellungen && !o.lauf; }
+function outboxLeer(o = S.outbox) { return !Object.keys(o.antworten).length && !Object.keys(o.laeufe).length && !Object.keys(o.notizen).length && !Object.keys(o.bewertungen || {}).length && !Object.keys(o.aktivitaet).length && !o.einstellungen && !o.lauf; }
 function mischeOutbox(alt) {
   const n = S.outbox;
   for (const [q, a] of Object.entries(alt.antworten || {})) if (!n.antworten[q]) n.antworten[q] = a;
   for (const [k, l] of Object.entries(alt.laeufe || {})) { const seen = new Set((n.laeufe[k] || []).map(x => x.datum)); n.laeufe[k] = (n.laeufe[k] || []).concat(l.filter(x => !seen.has(x.datum))); }
   for (const [id, x] of Object.entries(alt.notizen || {})) if (!n.notizen[id]) n.notizen[id] = x;
+  for (const [q, x] of Object.entries(alt.bewertungen || {})) if (!n.bewertungen[q]) n.bewertungen[q] = x;
   for (const [t, x] of Object.entries(alt.aktivitaet || {})) n.aktivitaet[t] = Math.max(n.aktivitaet[t] || 0, x);
   if (!n.einstellungen && alt.einstellungen) n.einstellungen = alt.einstellungen;
   if (!n.lauf && alt.lauf) n.lauf = alt.lauf;
@@ -392,6 +442,7 @@ function allesInOutbox() {
   Object.assign(o.antworten, S.antworten);
   for (const [k, l] of Object.entries(S.laeufe)) o.laeufe[k] = l;
   Object.assign(o.notizen, S.notizen);
+  Object.assign(o.bewertungen, S.bewertungen);
   Object.assign(o.aktivitaet, S.aktivitaet);
   if (S.einstellungen && S.einstellungen.zeit) o.einstellungen = S.einstellungen;
   if (S.laufZeit) o.lauf = { daten: S.lauf ? klon(S.lauf) : null, zeit: S.laufZeit };
@@ -417,12 +468,13 @@ function uebernehme(doc) {
   }
   for (const [q, a] of Object.entries(doc.antworten || {})) if (mergeAntwort(q, a)) neu = true;
   for (const [k, l] of Object.entries(doc.laeufe || {})) if (mergeLaeufe(k, l)) neu = true;
-  for (const [id, n] of Object.entries(doc.notizen || {})) { const cur = S.notizen[id]; if (!cur || (n.zeit || "") > (cur.zeit || "")) { S.notizen[id] = n; neu = true; } }
+  for (const [id, n] of Object.entries(doc.notizen || {})) { const cur = S.notizen[id]; if (!cur || (n.zeit || "") > (cur.zeit || "")) { S.notizen[id] = n; neu = true; PAUSE = null; } }
+  for (const [q, b] of Object.entries(doc.bewertungen || {})) { const cur = S.bewertungen[q]; if (b && (!cur || (b.zeit || "") > (cur.zeit || ""))) { S.bewertungen[q] = b; neu = true; } }
   for (const [t, n] of Object.entries(doc.aktivitaet || {})) if ((n || 0) > (S.aktivitaet[t] || 0)) { S.aktivitaet[t] = n; neu = true; }
   if (doc.einstellungen && (doc.einstellungen.zeit || "") > (S.einstellungen.zeit || "")) { S.einstellungen = doc.einstellungen; neu = true; }
   if (doc.lauf && (doc.lauf.zeit || "") > (S.laufZeit || "") && S.ansicht !== "lauf" && S.ansicht !== "ergebnis") {
     const d = doc.lauf.daten;
-    S.lauf = d && Array.isArray(d.qids) && d.qids.every(q => S.fragen[q]) ? d : null;
+    S.lauf = bereinigterLauf(d);
     S.laufZeit = doc.lauf.zeit; neu = true;
   }
   if (doc.lesetoken) S.lesetoken = doc.lesetoken;
@@ -533,7 +585,7 @@ function serie() { let n = 0; let t = tagIso(); if (!S.aktivitaet[t]) t = addTag
 function tagesplan() {
   const heute = tagIso(); const ziel = S.einstellungen.tagesziel || 5;
   const faellig = [], neu = [];
-  for (const q of S.reihenfolge) { const a = S.antworten[q]; if (a) { if ((a.faellig || heute) <= heute) faellig.push(q); } else neu.push(q); }
+  for (const q of S.reihenfolge) { if (pausiert(q)) continue; const a = S.antworten[q]; if (a) { if ((a.faellig || heute) <= heute) faellig.push(q); } else neu.push(q); }
   faellig.sort((x, y) => (S.antworten[x].faellig || "").localeCompare(S.antworten[y].faellig || "") || (S.antworten[x].box || 0) - (S.antworten[y].box || 0));
   return { heute, ziel, faellig, neu, erledigt: S.aktivitaet[heute] || 0 };
 }
@@ -559,7 +611,7 @@ $("#brand").addEventListener("click", () => go("start"));
 $("#nav").addEventListener("click", (e) => { const b = e.target.closest("button[data-go]"); if (b) go(b.dataset.go); });
 // Tastatur am PC: 1 bis 9 wählt eine Antwort, Enter prüft bzw. geht weiter
 document.addEventListener("keydown", (e) => {
-  if (S.ansicht !== "lauf" || !S.lauf || S.lauf.ende || e.altKey || e.ctrlKey || e.metaKey || e.repeat) return;
+  if (S.ansicht !== "lauf" || !S.lauf || S.lauf.ende || e.altKey || e.ctrlKey || e.metaKey || e.repeat || $("#dlg").open) return;
   const t = e.target; const tag = (t && t.tagName) || "";
   if (tag === "TEXTAREA" || tag === "SELECT" || tag === "BUTTON" || tag === "A" || (tag === "INPUT" && !/^(radio|checkbox)$/.test(t.type)) || (t && t.isContentEditable)) return;
   const L = S.lauf; const f = aktuelleFrage(); if (!f) return;
@@ -621,8 +673,8 @@ function weiterPanel() {
 
 /* ================= Heute ================= */
 function viewHeute() {
-  const p = tagesplan(); const g = gesamtStats(); const st = serie();
-  const neuHeute = Math.max(0, p.ziel - Math.min(p.faellig.length, p.ziel));
+  const tr = tagesrundeAuswahl(); const p = tr.p; const g = gesamtStats(); const st = serie();
+  const schwer = schwereFragen();
   const groessen = S.daten.tests.map(t => t.fragen.length);
   const rundenHeute = (S.laeufe.runden || []).filter(l => tagIso(new Date(l.datum)) === p.heute);
   const besteSerie = rundenHeute.reduce((m, l) => Math.max(m, l.serie || 0), 0);
@@ -635,16 +687,16 @@ function viewHeute() {
       h("span", { class: "label", style: "color:inherit;opacity:.75" }, "Tagesrunde"),
       h("div", { class: "trio" },
         h("div", null, h("div", { class: "big mono" }, p.faellig.length), h("div", { class: "small muted" }, "fällig zum Wiederholen")),
-        h("div", null, h("div", { class: "big mono" }, Math.min(neuHeute, p.neu.length)), h("div", { class: "small muted" }, "neue Fragen")),
+        h("div", null, h("div", { class: "big mono" }, tr.nNeu), h("div", { class: "small muted" }, "neue in der Runde")),
         h("div", null, h("div", { class: "big mono" }, p.erledigt), h("div", { class: "small muted" }, "heute beantwortet"))),
       h("p", { class: "small muted" }, p.faellig.length || p.neu.length
-        ? "Eine Tagesrunde hat " + p.ziel + " Fragen: zuerst das Fällige, dann Neues in der Reihenfolge der Module. Gemischt, damit du Themen unterscheiden lernst."
+        ? "Nächste Runde: " + tr.nFaellig + (tr.nFaellig === 1 ? " Wiederholung" : " Wiederholungen") + " und " + tr.nNeu + " neue. Höchstens " + Math.ceil(p.ziel * 0.6) + " von " + p.ziel + " sind Wiederholungen, und keine Frage kommt zweimal am selben Tag."
         : "Für heute ist alles erledigt. Die nächste Wiederholung ist am " + fmtTag(naechsteFaellig() || addTage(p.heute, 1)) + "."),
       h("div", { class: "actions" },
         offenerLauf() && offenerLauf().art === "heute"
           ? h("button", { class: "btn primary", type: "button", onclick: () => go("lauf") }, "Tagesrunde fortsetzen")
           : h("button", { class: "btn primary", type: "button", disabled: !(p.faellig.length || p.neu.length), onclick: starteTagesrunde }, "Tagesrunde starten"),
-        p.faellig.length > p.ziel ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "heute", titel: "Alle fälligen Fragen", qids: shuffled(p.faellig, Date.now() % 99991), modus: "lernen" }) }, "Alle " + p.faellig.length + " fälligen") : null)),
+        p.faellig.length > tr.nFaellig ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "heute", titel: "Alle fälligen Fragen", qids: shuffled(waehle([p.faellig], p.faellig.length, 99), Date.now() % 99991), modus: "lernen" }) }, "Alle " + p.faellig.length + " fälligen") : null)),
     h("div", { class: "panel runde" },
       h("span", { class: "label" }, "Zwischendurch"),
       h("h2", null, "Schnelle Runde"),
@@ -652,6 +704,8 @@ function viewHeute() {
       h("div", { class: "actions" },
         h("button", { class: "btn primary", type: "button", onclick: () => starteRunde({ typ: "alle" }, 5) }, "5 Fragen"),
         h("button", { class: "btn", type: "button", onclick: () => starteRunde({ typ: "alle" }, 10) }, "10 Fragen")),
+      schwer.length ? h("div", { class: "row", style: "margin-top:4px" }, h("span", { class: "small muted", style: "flex:1;min-width:10em" }, schwer.length + (schwer.length === 1 ? " Frage" : " Fragen") + " als schwer bewertet."),
+        h("button", { class: "btn", type: "button", onclick: () => starteRunde({ typ: "schwer" }, 5) }, "Nur schwere")) : h("p", { class: "small muted" }, "Tipp: Bewerte Fragen nach dem Antworten als leicht, mittel oder schwer. Dann kannst du hier nur die schweren lernen."),
       rundenHeute.length ? h("p", { class: "small muted" }, "Heute " + rundenHeute.length + (rundenHeute.length === 1 ? " Runde" : " Runden") + " gespielt" + (besteSerie > 1 ? ", beste Serie " + besteSerie + " richtig in Folge." : ".")) : null)),
     h("div", { class: "stats" },
       h("div", { class: "stat" }, h("span", { class: "label" }, "Gemeistert"), h("b", null, g.meister), h("span", { class: "small muted mono" }, "von " + g.gesamt)),
@@ -679,19 +733,44 @@ function viewHeute() {
     h("div", { class: "panel stack" },
       h("div", { class: "row" }, h("span", { class: "small" }, "Fragen pro Tagesrunde"), h("span", { class: "spacer" }),
         h("div", { class: "seg-ctl", role: "group", "aria-label": "Tagesziel" }, [5, 10, 15, 20].map(n => h("button", { type: "button", "aria-pressed": p.ziel === n ? "true" : "false", onclick: () => { setzeEinstellung({ tagesziel: n, ziel5: true }); render(); } }, n)))),
-      h("p", { class: "small muted" }, "So funktioniert der Wiederholungsplan: Richtig beantwortete Fragen kommen nach 1, 3, 7, 14 und 30 Tagen wieder. Falsche Antworten kommen am nächsten Tag zurück. Eine Frage gilt als gemeistert, wenn du sie dreimal zu ihrem Termin richtig hattest. Üben vor dem Termin schadet nicht, zählt aber erst am Termin.")),
+      h("p", { class: "small muted" }, "So funktioniert der Wiederholungsplan: Richtig beantwortete Fragen kommen nach 2, 4, 8, 15 und 30 Tagen wieder. Falsche Antworten kommen am nächsten Tag zurück. Als schwer bewertete Fragen kommen öfter, leichte seltener. Eine Frage gilt als gemeistert, wenn du sie dreimal zu ihrem Termin richtig hattest. Üben vor dem Termin schadet nicht, zählt aber erst am Termin.")),
     !S.code ? h("div", { class: "panel row" }, h("span", { class: "dot warn" }), h("span", { class: "small", style: "flex:1;min-width:0" }, "Dein Fortschritt liegt nur auf diesem Gerät. Verbinde Handy und PC mit einem Lern-Code."), h("button", { class: "btn", type: "button", onclick: () => go("geraete") }, "Geräte verbinden")) : null
   ));
   return frag;
 }
-function starteTagesrunde() {
-  const p = tagesplan(); const qids = p.faellig.slice(0, p.ziel);
-  let texte = qids.filter(q => S.fragen[q].typ === "text").length;
-  for (const q of p.neu) {
-    if (qids.length >= p.ziel) break;
-    if (S.fragen[q].typ === "text") { if (texte >= 1) continue; texte++; }
-    qids.push(q);
+/* ---------- Auswahl für alle Runden ---------- */
+// Seit 2.3: dieselbe Frage nicht zweimal am selben Tag, verwandte Fragen (gleiche Tatsache) nie zusammen und nicht am selben Tag,
+// pausierte Fragen (offene Anmerkung "bis zur Prüfung nicht abfragen") gar nicht.
+function heuteBeantwortet(q) { const a = S.antworten[q]; return !!(a && a.zeit && tagIso(new Date(a.zeit)) === tagIso()); }
+function gruppenHeute() { const g = new Set(); for (const q of Object.keys(S.verwandtVon)) if (heuteBeantwortet(q)) g.add(S.verwandtVon[q]); return g; }
+function waehle(listen, n, maxText = 0, schon = []) {
+  const wahl = schon.slice(), zurueck = [];
+  const gruppen = new Set(wahl.map(q => S.verwandtVon[q]).filter(Boolean));
+  const heuteG = gruppenHeute();
+  let texte = wahl.filter(q => S.fragen[q].typ === "text").length;
+  const nimm = (q) => { wahl.push(q); const g = S.verwandtVon[q]; if (g) gruppen.add(g); if (S.fragen[q].typ === "text") texte++; };
+  const passt = (q) => !wahl.includes(q) && S.fragen[q] && !pausiert(q) && !(S.fragen[q].typ === "text" && texte >= maxText) && !(S.verwandtVon[q] && gruppen.has(S.verwandtVon[q]));
+  for (const liste of listen) for (const q of liste) {
+    if (wahl.length >= n) break;
+    if (!passt(q)) continue;
+    if (heuteBeantwortet(q) || heuteG.has(S.verwandtVon[q])) { zurueck.push(q); continue; }
+    nimm(q);
   }
+  // Nur wenn sonst nichts mehr da ist: heute schon Geübtes
+  for (const q of zurueck) { if (wahl.length >= n) break; if (passt(q)) nimm(q); }
+  return wahl;
+}
+// Tagesrunde: höchstens 60 % Wiederholungen (bei 5 Fragen: 3), der Rest neu in der Reihenfolge der Module. Fehlt Neues, mehr Wiederholungen.
+function tagesrundeAuswahl() {
+  const p = tagesplan();
+  const maxF = p.neu.length ? Math.ceil(p.ziel * 0.6) : p.ziel;
+  let qids = waehle([p.faellig], Math.min(maxF, p.ziel), 1);
+  qids = waehle([p.neu], p.ziel, 1, qids);
+  qids = waehle([p.faellig], p.ziel, 1, qids);
+  return { p, qids, nFaellig: qids.filter(q => S.antworten[q]).length, nNeu: qids.filter(q => !S.antworten[q]).length };
+}
+function starteTagesrunde() {
+  const { qids } = tagesrundeAuswahl();
   if (!qids.length) { toast("Für heute ist alles erledigt."); return; }
   starteLauf({ art: "heute", titel: "Tagesrunde " + new Date().toLocaleDateString("de-DE"), qids: shuffled(qids, Date.now() % 100003), modus: "lernen" });
 }
@@ -709,58 +788,57 @@ function miniBar(s) {
 }
 // Eine Runde lohnt sich nur mit mindestens 3 Fragen ohne Freitext (Praxisfälle sind fast nur Freitext)
 function rundeMoeglich(qids) { return qids.filter(q => S.fragen[q].typ !== "text").length >= 3; }
+function schwereFragen(pool) { return (pool || S.reihenfolge).filter(q => stufeVon(q) === "schwer"); }
 function rundePool(scope) {
   if (scope.typ === "modul") return modulFragen(scope.id);
   if (scope.typ === "test") return S.tests[scope.id] ? S.tests[scope.id].fragen.map(f => f.id) : [];
+  if (scope.typ === "schwer") return schwereFragen(scope.thema && S.themen[scope.thema] ? S.themen[scope.thema].fragen : null);
   return S.reihenfolge.slice();
 }
 function rundeTitel(scope) {
   if (scope.typ === "modul") { const m = S.daten.module.find(x => x.id === scope.id); return "Runde: Modul " + scope.id + (m ? " · " + m.titel : ""); }
   if (scope.typ === "test" && S.tests[scope.id]) return "Runde: " + scope.id.toUpperCase() + " · " + S.tests[scope.id].titel;
+  if (scope.typ === "schwer") return "Schwere Fragen" + (scope.thema && S.themen[scope.thema] ? ": " + S.themen[scope.thema].titel : "");
   return "Runde: alle Themen";
 }
-// Auswahl: zuerst Fälliges, dann zuletzt Falsches, dann Neues, dann was am längsten her ist.
+// Auswahl: zuerst Fälliges, dann zuletzt Falsches, dann Neues, dann was am längsten her ist (Regeln in waehle()).
 // Standard (schnelle Runde): ohne Freitext, neue Fragen reihum aus verschiedenen Tests, gemischt.
-// Thema (opt.thema): höchstens ein Freitext, neue Fragen in der Lernreihenfolge des Themas, nicht gemischt.
+// opt.geordnet (Thema): neue Fragen in der Lernreihenfolge, nicht gemischt. opt.maxText: erlaubte Freitexte.
 function rundeFragen(pool, n, opt = {}) {
   const heute = tagIso();
+  const maxText = opt.maxText || 0;
   const faellig = [], falsch = [], neu = [], rest = [];
-  const maxText = opt.thema ? 1 : 0;
   for (const q of pool) {
-    if (S.fragen[q].typ === "text" && !maxText) continue;
+    if (!S.fragen[q] || (S.fragen[q].typ === "text" && !maxText)) continue;
     const a = S.antworten[q];
     if (!a) neu.push(q);
     else if ((a.faellig || heute) <= heute) faellig.push(q);
-    // Im Thema: heute schon Beantwortetes nach hinten, damit "Nächste 5 Fragen" weiterführt (Fehler gibt es extra per "nochmal")
-    else if (a.punkte < 1 && !(opt.thema && a.zeit && tagIso(new Date(a.zeit)) === heute)) falsch.push(q);
+    else if (a.punkte < 1) falsch.push(q);
     else rest.push(q);
   }
   const A = (q) => S.antworten[q];
   faellig.sort((x, y) => (A(x).faellig || "").localeCompare(A(y).faellig || "") || (A(x).box || 0) - (A(y).box || 0));
   rest.sort((x, y) => (A(x).zeit || "").localeCompare(A(y).zeit || ""));
   // Neue Fragen reihum aus verschiedenen Tests, innerhalb eines Tests in der Reihenfolge des Bogens
-  const proTest = new Map();
-  for (const q of neu) { const t = S.testVon[q]; if (!proTest.has(t)) proTest.set(t, []); proTest.get(t).push(q); }
-  const reihen = shuffled([...proTest.values()], Date.now() % 7919);
   const neuMix = [];
-  if (opt.thema) neuMix.push(...neu);
-  else for (let r = 0; neuMix.length < neu.length; r++) for (const l of reihen) if (l[r]) neuMix.push(l[r]);
-  const wahl = []; let texte = 0;
-  for (const liste of [faellig, falsch, neuMix, rest]) for (const q of liste) {
-    if (wahl.length >= n) break;
-    if (S.fragen[q].typ === "text") { if (texte >= maxText) continue; texte++; }
-    wahl.push(q);
+  if (opt.geordnet) neuMix.push(...neu);
+  else {
+    const proTest = new Map();
+    for (const q of neu) { const t = S.testVon[q]; if (!proTest.has(t)) proTest.set(t, []); proTest.get(t).push(q); }
+    const reihen = shuffled([...proTest.values()], Date.now() % 7919);
+    for (let r = 0; neuMix.length < neu.length; r++) for (const l of reihen) if (l[r]) neuMix.push(l[r]);
   }
-  return opt.thema ? wahl : shuffled(wahl, Date.now() % 1000003);
+  const wahl = waehle([faellig, falsch, neuMix, rest], n, maxText);
+  return opt.geordnet ? wahl : shuffled(wahl, Date.now() % 1000003);
 }
 function starteRunde(scope, n) {
-  const qids = rundeFragen(rundePool(scope), n);
-  if (!qids.length) { toast("Hier gibt es keine passenden Fragen."); return; }
-  starteLauf({ art: "runde", scope, n, titel: rundeTitel(scope), qids, modus: "lernen" });
+  const qids = rundeFragen(rundePool(scope), n, scope.typ === "schwer" ? { maxText: 1 } : {});
+  if (!qids.length) { toast(scope.typ === "schwer" ? "Gerade keine schweren Fragen. Bewerte Fragen nach dem Antworten mit Schwer." : "Hier gibt es keine passenden Fragen."); return; }
+  starteLauf({ art: "runde", scope, n, titel: rundeTitel(scope), qids, modus: "lernen", thema: scope.thema || undefined });
 }
 function starteThemaRunde(id, n = 5) {
   const th = S.themen[id]; if (!th) return;
-  const qids = rundeFragen(th.fragen, n, { thema: true });
+  const qids = rundeFragen(th.fragen, n, { maxText: 1, geordnet: true });
   if (!qids.length) { toast("Hier gibt es keine passenden Fragen."); return; }
   starteLauf({ art: "thema", thema: id, n, titel: "Thema: " + th.titel, qids, modus: "lernen" });
 }
@@ -854,7 +932,8 @@ function zettelListe(qids, mitTest) {
       f.typ !== "text" || (f.erklaerung && !f.erklaerung.startsWith("Vergleiche")) ? h("p", { class: "small" }, f.erklaerung) : null,
       f.hinweis ? h("p", { class: "hint" }, "Hinweis: " + f.hinweis) : null,
       f.quelle ? h("p", { class: "src" }, "Quelle: " + f.quelle) : null,
-      claudeLinkKlein(erklaerText(f, null)));
+      bewertungLeiste(f, false),
+      h("div", { class: "row" }, claudeLinkKlein(erklaerText(f, null)), h("button", { class: "linkbtn claude-klein", type: "button", onclick: () => anmerkenDialog(f) }, "Anmerken")));
   }));
 }
 
@@ -920,7 +999,8 @@ function viewThema(id) {
           : h("button", { class: "btn primary", type: "button", onclick: () => starteThemaRunde(id, 5) }, "5 Fragen lernen"),
         h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "thema", thema: id, alle: true, titel: th.titel + " (alle Fragen)", qids: th.fragen.slice(), modus: "lernen" }) }, "Alle " + th.fragen.length + " am Stück"),
         h("button", { class: "btn ghost", type: "button", onclick: () => go("tzettel", id) }, "Lernzettel"),
-        falsche.length ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "fehler", thema: id, titel: th.titel + " – Fehler", qids: falsche, modus: "lernen" }) }, falsche.length + " Fehler üben") : null),
+        falsche.length ? h("button", { class: "btn ghost", type: "button", onclick: () => starteLauf({ art: "fehler", thema: id, titel: th.titel + " – Fehler", qids: falsche, modus: "lernen" }) }, falsche.length + " Fehler üben") : null,
+        schwereFragen(th.fragen).length ? h("button", { class: "btn ghost", type: "button", onclick: () => starteRunde({ typ: "schwer", thema: id }, 5) }, "Nur schwere (" + schwereFragen(th.fragen).length + ")") : null),
       h("p", { class: "small muted" }, "5 Fragen lernen: zuerst Fälliges und Fehler aus diesem Thema, dann neue Fragen in einer sinnvollen Reihenfolge (erst Grundlagen, dann Rechnen). Danach einfach die nächsten 5. Antworten zählen wie überall für den Wiederholungsplan.")),
     h("div", { class: "panel stack" },
       h("h3", null, "Die Fragen kommen aus"),
@@ -971,7 +1051,7 @@ function viewLauf() {
       h("button", { class: "linkbtn", type: "button", onclick: zurueckZiel(L) }, "← Pause"),
       h("span", { class: "spacer" }),
       L.modus === "lernen" && serieJetzt(L) >= 2 ? h("span", { class: "streak", "aria-live": "polite" }, serieJetzt(L) + " richtig in Folge") : null,
-      h("span", { class: "chip " + (L.modus === "pruefung" ? "part" : "acc") }, L.art === "runde" ? "Schnelle Runde" : L.art === "thema" ? "Thema" : L.modus === "pruefung" ? "Prüfungsmodus" : "Lernmodus")),
+      h("span", { class: "chip " + (L.modus === "pruefung" ? "part" : "acc") }, L.art === "runde" ? (L.scope && L.scope.typ === "schwer" ? "Schwere Fragen" : "Schnelle Runde") : L.art === "thema" ? "Thema" : L.modus === "pruefung" ? "Prüfungsmodus" : "Lernmodus")),
     h("h2", null, L.titel),
     h("div", { class: "qgrid", role: "navigation", "aria-label": "Fragenübersicht" }, L.qids.map((qid, i) => {
       let cls = "";
@@ -995,6 +1075,8 @@ function frageKarte(f, tid) {
     h("span", { class: "label" }, TYPNAME[f.typ]),
     S.ueberarbeitet.has(f.id) ? h("span", { class: "chip part" }, "überarbeitet") : null,
     a && a.box ? h("span", { class: "chip" }, "Fach " + a.box + " von 5") : null,
+    stufeVon(f.id) ? h("span", { class: "chip " + { leicht: "ok", mittel: "part", schwer: "bad" }[stufeVon(f.id)] }, STUFEN.find(x => x[0] === stufeVon(f.id))[1]) : null,
+    offeneAnmerkungen(f.id).length ? h("span", { class: "chip" }, pausiert(f.id) ? "angemerkt, pausiert" : "angemerkt") : null,
     h("span", { class: "spacer" }),
     h("span", { class: "small muted mono" }, (L.idx + 1) + " / " + L.qids.length)));
   card.append(h("p", { class: "qtext" }, f.frage));
@@ -1028,7 +1110,7 @@ function frageKarte(f, tid) {
     card.append(h("p", { class: "keys" }, "Tastatur: 1 bis " + n + " wählen" + (f.typ === "wahr" ? " (1 = Richtig, 2 = Falsch)" : "") + ", Enter " + (L.modus === "lernen" ? "prüfen und weiter" : "nächste Frage") + "."));
   }
   if (zeigeLoesung) card.append(feedbackBox(f, erg));
-  card.append(notizLink(f, tid));
+  card.append(anmerkenLink(f));
   return card;
 }
 
@@ -1143,19 +1225,60 @@ function plane(f, alt, punkte, unsicher) {
   const gilt = alt && gueltig(f.id, alt);
   const altBox = gilt ? (alt.box || 0) : 0;
   const altTag = gilt && alt.zeit ? tagIso(new Date(alt.zeit)) : null;
-  let box;
+  let box, auf = false;
   if (punkte < 1) box = 1;
   else if (unsicher) box = Math.max(1, Math.min(altBox, 2));
-  else if (altBox > 0 && alt.faellig && alt.faellig > heute) return { box: altBox, faellig: alt.faellig };
+  else if (altBox > 0 && alt.faellig && alt.faellig > heute) return { box: altBox, faellig: alt.faellig, auf: false };
   else if (altTag === heute && altBox > 0) box = altBox;
-  else box = Math.min(5, altBox + 1);
-  return { box, faellig: addTage(heute, punkte >= 1 ? ABSTAND[box] : 1) };
+  else { box = Math.min(5, altBox + 1); auf = true; }
+  return { box, faellig: addTage(heute, punkte >= 1 ? ABSTAND[box] : 1), auf };
+}
+// Bewertung wirkt auf den Plan. Schwer: höchstens Fach 2, direkt nach dem Bewerten morgen wieder.
+// Leicht: ein Fach weiter, aber nur wenn die Frage gerade zum Termin aufgestiegen ist (Üben vor dem Termin zählt weiter nicht).
+function mitBewertung(basis, punkte, stufe, geradeBewertet) {
+  const heute = tagIso();
+  if (punkte < 1 || !stufe || stufe === "mittel") return { box: basis.box, faellig: basis.faellig };
+  if (stufe === "schwer") {
+    const box = Math.max(1, Math.min(basis.box, 2));
+    const spaetestens = geradeBewertet ? addTage(heute, 1) : addTage(heute, ABSTAND[box]);
+    return { box, faellig: basis.faellig && basis.faellig < spaetestens ? basis.faellig : spaetestens };
+  }
+  if (stufe === "leicht" && basis.auf) { const box = Math.min(5, basis.box + 1); return { box, faellig: addTage(heute, ABSTAND[box]) }; }
+  return { box: basis.box, faellig: basis.faellig };
+}
+function stufeVon(q) { const b = S.bewertungen[q]; const f = S.fragen[q]; return b && b.stufe && f && (!b.fp || b.fp === f.fp) ? b.stufe : null; }
+function setzeStufe(f, stufe, nachAntwort) {
+  S.bewertungen[f.id] = { stufe, zeit: nowIso(), fp: f.fp };
+  S.outbox.bewertungen[f.id] = S.bewertungen[f.id];
+  // Direkt nach der Antwort: Plan dieser Antwort neu berechnen
+  const a = S.antworten[f.id];
+  if (nachAntwort && a && a.basis && heuteBeantwortet(f.id)) {
+    const p = mitBewertung(a.basis, a.punkte, stufe, true);
+    const rec = Object.assign({}, a, { box: p.box, faellig: p.faellig, zeit: nowIso() });
+    S.antworten[f.id] = rec; S.outbox.antworten[f.id] = rec;
+  }
+  if (S.lauf) laufGeaendert(); else planeSync();
+}
+const fmtTagKurz = (tag) => { try { return new Date(tag + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" }); } catch (e) { return tag; } };
+function bewertungLeiste(f, nachAntwort) {
+  const box = h("div", { class: "bewertung" });
+  const zeichne = () => {
+    const cur = stufeVon(f.id); const a = S.antworten[f.id];
+    box.replaceChildren(
+      h("span", { class: "small muted" }, nachAntwort ? "Wie schwer war das für dich?" : "Deine Einschätzung:"),
+      h("div", { class: "seg-ctl stufen", role: "group", "aria-label": "Schwierigkeit" }, STUFEN.map(([k, txt]) =>
+        h("button", { type: "button", class: k, "aria-pressed": cur === k ? "true" : "false", onclick: () => { setzeStufe(f, cur === k ? null : k, nachAntwort); zeichne(); } }, txt))),
+      nachAntwort && a && a.faellig ? h("span", { class: "small muted" }, "Kommt wieder: " + fmtTagKurz(a.faellig)) : null);
+  };
+  zeichne();
+  return box;
 }
 function speichereAntwort(f, erg) {
   const alt = S.antworten[f.id];
   const unsicher = !!(S.lauf && S.lauf.unsicher && S.lauf.unsicher[f.id]);
-  const plan = plane(f, alt, erg.punkte, unsicher);
-  const rec = { punkte: erg.punkte, ok: erg.punkte >= 1, gegeben: erg.gegeben, zeit: nowIso(), versuche: (alt && gueltig(f.id, alt) && alt.versuche || 0) + 1, modus: S.lauf ? S.lauf.modus : "lernen", fp: f.fp, box: plan.box, faellig: plan.faellig };
+  const basis = plane(f, alt, erg.punkte, unsicher);
+  const plan = mitBewertung(basis, erg.punkte, stufeVon(f.id), false);
+  const rec = { punkte: erg.punkte, ok: erg.punkte >= 1, gegeben: erg.gegeben, zeit: nowIso(), versuche: (alt && gueltig(f.id, alt) && alt.versuche || 0) + 1, modus: S.lauf ? S.lauf.modus : "lernen", fp: f.fp, box: plan.box, faellig: plan.faellig, basis };
   if (unsicher) rec.unsicher = true;
   if (erg.kern) rec.kern = erg.kern;
   S.antworten[f.id] = rec; S.outbox.antworten[f.id] = rec;
@@ -1204,6 +1327,7 @@ function feedbackBox(f, erg) {
     box.append(h("details", null, h("summary", null, "Musterlösung"), h("p", { style: "margin-top:8px" }, f.muster)));
     if (f.erklaerung && !f.erklaerung.startsWith("Vergleiche")) box.append(h("p", null, f.erklaerung));
   } else box.append(h("p", null, f.erklaerung));
+  box.append(bewertungLeiste(f, true));
   if (f.hinweis) box.append(h("p", { class: "hint" }, "Hinweis: " + f.hinweis));
   if (f.quelle) box.append(h("p", { class: "src" }, "Quelle: " + f.quelle));
   box.append(f.typ === "text" ? claudeBox(claudeText(f, erg.gegeben), "In Claude besprechen") : claudeBox(erklaerText(f, erg, !!unsicher)));
@@ -1309,7 +1433,7 @@ function abschluss() {
   if (key) {
     const eintrag = { datum: L.ende, punkte, max: L.qids.length, modus: L.modus };
     if (L.art === "pruefung") eintrag.fragen = L.qids.slice();
-    if (L.art === "runde") { eintrag.bereich = L.scope && L.scope.typ !== "alle" ? L.scope.id : "alle"; eintrag.serie = L.besteSerie || 0; }
+    if (L.art === "runde") { eintrag.bereich = !L.scope || L.scope.typ === "alle" ? "alle" : L.scope.typ === "schwer" ? "schwer" + (L.scope.thema ? "-" + L.scope.thema : "") : L.scope.id; eintrag.serie = L.besteSerie || 0; }
     if (L.art === "thema") { eintrag.bereich = L.thema; eintrag.serie = L.besteSerie || 0; }
     (S.laeufe[key] = S.laeufe[key] || []).push(eintrag);
     S.outbox.laeufe[key] = S.laeufe[key];
@@ -1385,12 +1509,18 @@ function reviewListe(L) {
 /* ================= Fehler üben & Prüfung ================= */
 function viewFehler() {
   const liste = [];
-  for (const q of S.reihenfolge) { const a = S.antworten[q]; if (a && a.punkte < 1) liste.push(q); }
-  const unsicher = S.reihenfolge.filter(q => { const a = S.antworten[q]; return a && a.punkte >= 1 && a.unsicher; });
+  for (const q of S.reihenfolge) { const a = S.antworten[q]; if (a && a.punkte < 1 && !pausiert(q)) liste.push(q); }
+  const unsicher = S.reihenfolge.filter(q => { const a = S.antworten[q]; return a && a.punkte >= 1 && a.unsicher && !pausiert(q); });
+  const schwer = schwereFragen().filter(q => !pausiert(q));
   const box = h("section", { class: "stack" },
-    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Wiederholen"), h("h1", null, "Fehler üben"),
-      h("p", { class: "muted" }, "Hier landen alle Fragen, die du zuletzt falsch oder nur teilweise richtig hattest. Sobald du sie richtig beantwortest, verschwinden sie aus der Liste.")));
-  if (!liste.length && !unsicher.length) { box.append(h("div", { class: "panel empty" }, "Gerade gibt es nichts zu wiederholen.")); return box; }
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Wiederholen"), h("h1", null, "Fehler und schwere Fragen"),
+      h("p", { class: "muted" }, "Hier landen alle Fragen, die du zuletzt falsch oder nur teilweise richtig hattest, und alle, die du als schwer bewertet hast. Falsche verschwinden, sobald du sie richtig beantwortest, schwere, sobald du sie anders bewertest.")));
+  if (schwer.length) box.append(h("div", { class: "panel stack" },
+    h("p", null, h("b", { class: "mono" }, schwer.length), schwer.length === 1 ? " Frage als schwer bewertet." : " Fragen als schwer bewertet."),
+    h("div", { class: "actions", style: "margin-top:0" },
+      h("button", { class: "btn primary", type: "button", onclick: () => starteRunde({ typ: "schwer" }, 5) }, "5 schwere lernen"),
+      h("button", { class: "btn", type: "button", onclick: () => starteLauf({ art: "fehler", titel: "Alle schweren Fragen", qids: shuffled(waehle([schwer], schwer.length, 99), Date.now() % 99991), modus: "lernen" }) }, "Alle " + schwer.length + " schweren"))));
+  if (!liste.length && !unsicher.length) { box.append(h("div", { class: "panel empty" }, schwer.length ? "Gerade keine falschen Fragen." : "Gerade gibt es nichts zu wiederholen.")); return box; }
   const proTest = {}; for (const q of liste) (proTest[S.testVon[q]] = proTest[S.testVon[q]] || []).push(q);
   box.append(h("div", { class: "panel stack" },
     h("p", null, h("b", { class: "mono" }, liste.length), " falsche Fragen aus ", h("b", { class: "mono" }, Object.keys(proTest).length), " Tests" + (unsicher.length ? ", dazu " + unsicher.length + " richtig, aber unsicher." : ".")),
@@ -1405,11 +1535,12 @@ function viewFehler() {
 
 function viewPruefung() {
   const alle = []; const texte = [];
-  for (const q of S.reihenfolge) (S.fragen[q].typ === "text" ? texte : alle).push(q);
+  for (const q of S.reihenfolge) if (!pausiert(q)) (S.fragen[q].typ === "text" ? texte : alle).push(q);
   const laeufe = S.laeufe.pruefungen || [];
   const starte = (n, nText) => {
     const seed = Date.now() % 1000003;
-    const qids = shuffled(alle, seed).slice(0, n - nText).concat(shuffled(texte, seed + 7).slice(0, nText));
+    // verwandte Fragen (gleiche Tatsache) nicht zusammen in einer Prüfung
+    const qids = waehle([shuffled(alle, seed)], n - nText, 0).concat(shuffled(texte, seed + 7).slice(0, nText));
     starteLauf({ art: "pruefung", titel: "Prüfungssimulation (" + n + " Fragen)", qids: shuffled(qids, seed + 3), modus: "pruefung" });
   };
   return h("section", { class: "stack" },
@@ -1426,57 +1557,291 @@ function viewPruefung() {
       : null);
 }
 
-/* ================= Notizen & Fehler melden ================= */
+/* ================= Notizen, Anmerkungen und Wünsche ================= */
+// Kreislauf: Nils merkt an oder wünscht sich etwas -> die App zeigt sofort Ähnliches aus dem Katalog -> Claude prüft beim Einarbeiten
+// (inhalte/suche.py), baut ein und antwortet in inhalte/rueckmeldungen.py -> die Antwort steht hier an der Notiz, die Notiz gilt als erledigt.
+const NOTIZ_TYP = { pruefen: "Antwort prüfen", unklar: "Unklar", doppelt: "Doppelt", ergaenzung: "Ergänzung", frage: "Wunsch: neue Frage", thema: "Wunsch: neues Thema", erkenntnis: "Erkenntnis", sonstiges: "Anmerkung" };
+const NOTIZ_FARBE = { pruefen: "bad", unklar: "part", doppelt: "part", ergaenzung: "acc", frage: "acc", thema: "acc", erkenntnis: "ok", sonstiges: "" };
+function notizTyp(n) { if (n && n.typ && NOTIZ_TYP[n.typ]) return n.typ; if (n && n.art === "wunsch") return "frage"; return n && n.frage_id ? "sonstiges" : "erkenntnis"; }
+function rueckVon(n) { return (S.daten && S.daten.rueckmeldungen && S.daten.rueckmeldungen[n.id]) || null; }
+function notizStatus(n) {
+  if (!n) return "offen";
+  if (n.status === "geloescht") return "geloescht";
+  if (n.status === "erledigt") return "erledigt";
+  const r = rueckVon(n);
+  if (r && !(n.wieder && n.wieder > r.zeit)) return "erledigt";
+  return "offen";
+}
+let PAUSE = null; // Fragen mit offener Anmerkung "bis zur Prüfung nicht abfragen"
+function pausiert(q) {
+  if (!PAUSE) { PAUSE = new Set(); for (const n of Object.values(S.notizen)) if (n && n.pause && n.frage_id && notizStatus(n) === "offen") PAUSE.add(n.frage_id); }
+  return PAUSE.has(q);
+}
+function offeneAnmerkungen(q) { return Object.values(S.notizen).filter(n => n && n.frage_id === q && notizStatus(n) === "offen"); }
 function notizId() { const b = new Uint8Array(6); crypto.getRandomValues(b); return "n" + Date.now().toString(36) + [...b].map(x => x.toString(36)).join("").slice(0, 8); }
-function speichereNotiz(n) {
+function speichereNotiz(n, meldung) {
   const id = notizId(); n.id = id; n.zeit = nowIso();
-  S.notizen[id] = n; S.outbox.notizen[id] = n; planeSync(500);
-  toast(S.code ? "Notiz gespeichert." : "Notiz auf diesem Gerät gespeichert. Verbinde deine Geräte, damit sie überall da ist.");
+  S.notizen[id] = n; S.outbox.notizen[id] = n; PAUSE = null; planeSync(500);
+  toast((meldung || "Gespeichert.") + (S.code ? "" : " Verbinde deine Geräte, damit es überall da ist."));
 }
-function setzeNotizStatus(n, status) { const neu = Object.assign({}, n, { status, zeit: nowIso() }); S.notizen[n.id] = neu; S.outbox.notizen[n.id] = neu; planeSync(500); render(); }
-function notizLink(f, tid) {
-  const wrap = h("div", { class: "note-box" });
-  const btn = h("button", { class: "linkbtn", type: "button" }, "Fehler gefunden oder etwas ergänzen?");
-  btn.addEventListener("click", () => {
-    btn.hidden = true;
-    const ta = h("textarea", { rows: 3, placeholder: "Was stimmt nicht oder was sollte ergänzt werden? Gern mit Quelle." });
-    const save = h("button", { class: "btn", type: "button" }, "Notiz speichern");
-    save.addEventListener("click", () => {
-      const text = ta.value.trim(); if (!text) { toast("Bitte kurz beschreiben."); return; }
-      speichereNotiz({ art: "frage", frage_id: f.id, test: tid, frage: f.frage.slice(0, 200), text, datum: nowIso(), status: "offen" });
-      wrap.replaceChildren(h("p", { class: "small muted" }, "Danke, ist notiert."));
-    });
-    wrap.append(ta, h("div", { class: "row" }, save, h("button", { class: "btn ghost", type: "button", onclick: () => { wrap.replaceChildren(btn); btn.hidden = false; } }, "Abbrechen")));
-    ta.focus();
-  });
-  wrap.append(btn);
-  return wrap;
+function setzeNotizStatus(n, status) {
+  const neu = Object.assign({}, n, { status, zeit: nowIso() });
+  if (status === "offen" && rueckVon(n)) neu.wieder = nowIso(); // nach Claudes Antwort wieder geöffnet
+  S.notizen[n.id] = neu; S.outbox.notizen[n.id] = neu; PAUSE = null; planeSync(500); render();
 }
+
+/* ---------- Ähnliche Fragen und Themen finden (wie inhalte/aehnlich.py) ---------- */
+const STOPW = new Set(("der die das ein eine einer eines einem einen und oder ist sind was wie wer wo warum wann welche welcher welches bei mit von für auf aus im in an zu zum zur " +
+  "den dem des nicht kein keine es sie er man du ich wir ihr hbod sich auch als dass so nur noch dann wenn über etwa je pro bis vom am um wird werden kann muss darf hat haben " +
+  "gibt mehr sehr oft kreuze alles richtige richtig falsch marke kunde kunden ihre ihren deine deiner dein diese dieser dieses").split(" "));
+function woerter(t) { return (String(t || "").toLowerCase().match(/[a-zäöüß0-9]+/g) || []).filter(w => w.length > 2 && !STOPW.has(w) && !/^\d+$/.test(w)).map(w => w.slice(0, 7)); }
+let SUCHINDEX = null;
+function suchIndex() {
+  if (SUCHINDEX) return SUCHINDEX;
+  const eintraege = [];
+  for (const q of S.reihenfolge) { const f = S.fragen[q]; eintraege.push({ art: "frage", id: q, text: [f.frage, f.frage, loesungText(f), f.erklaerung].join(" ") }); }
+  for (const th of Object.values(S.themen)) eintraege.push({ art: "thema", id: th.id, text: [th.titel, th.titel, th.titel, th.kurz].concat(th.punkte).join(" ") });
+  const df = new Map();
+  const zaehle = (text) => { const c = new Map(); for (const w of woerter(text)) c.set(w, (c.get(w) || 0) + 1); return c; };
+  const docs = eintraege.map(e => { const c = zaehle(e.text); for (const w of c.keys()) df.set(w, (df.get(w) || 0) + 1); return c; });
+  const N = eintraege.length;
+  const vek = (c) => { const v = new Map(); let n2 = 0; for (const [w, n] of c) { const x = (1 + Math.log(n)) * Math.log((N + 1) / ((df.get(w) || 0) + 0.5)); v.set(w, x); n2 += x * x; } const norm = Math.sqrt(n2) || 1; for (const [w, x] of v) v.set(w, x / norm); return v; };
+  SUCHINDEX = { eintraege, zaehle, vek, vecs: docs.map(vek) };
+  return SUCHINDEX;
+}
+function aehnliche(text, n = 6, ohne = null, schwelle = 0.12) {
+  const ix = suchIndex(); const c = ix.zaehle(text);
+  if (!c.size) return [];
+  const q = ix.vek(c); const out = [];
+  ix.vecs.forEach((v, i) => { let s = 0; for (const [w, x] of q) s += x * (v.get(w) || 0); const e = ix.eintraege[i]; if (s >= schwelle && e.id !== ohne) out.push(Object.assign({ s }, e)); });
+  return out.sort((a, b) => b.s - a.s).slice(0, n);
+}
+
+/* ---------- Kleines Fenster (Dialog) ---------- */
+function oeffneDialog(titel, ...inhalt) {
+  const d = $("#dlg");
+  d.replaceChildren(h("div", { class: "dlg-in" },
+    h("div", { class: "dlg-kopf" }, h("h2", { id: "dlg-t" }, titel), h("button", { class: "dlg-zu", type: "button", "aria-label": "Schließen", onclick: schliesseDialog }, "×")),
+    ...inhalt));
+  if (!d.open) { try { d.showModal(); } catch (e) { d.setAttribute("open", ""); } }
+  const erstes = d.querySelector("textarea, input[type=text]");
+  if (erstes && !matchMedia("(pointer: coarse)").matches) setTimeout(() => erstes.focus(), 30);
+}
+function schliesseDialog() { const d = $("#dlg"); if (d.open) { try { d.close(); } catch (e) { d.removeAttribute("open"); } } }
+$("#dlg").addEventListener("click", (e) => { if (e.target === $("#dlg")) schliesseDialog(); });
+$("#fab").addEventListener("click", () => hinzufuegenDialog());
+
+// Eine Frage mit Lösung ansehen, z. B. aus den Treffern oder einer Notiz
+function frageDialog(q) {
+  const f = S.alleFragen[q]; if (!f) { toast("Diese Frage gibt es nicht."); return; }
+  const t = S.tests[S.testVon[q]];
+  oeffneDialog(q.toUpperCase() + (t ? " · " + t.titel : ""),
+    h("div", { class: "stack", style: "gap:10px" },
+      f.aus ? h("p", { class: "hint" }, "Ausgeblendet: " + f.aus) : null,
+      h("p", { class: "qtext", style: "margin:0" }, f.frage),
+      h("p", null, h("b", null, f.typ === "text" ? "Musterlösung: " : "Lösung: "), loesungText(f)),
+      f.erklaerung && !f.erklaerung.startsWith("Vergleiche") ? h("p", { class: "small" }, f.erklaerung) : null,
+      f.hinweis ? h("p", { class: "hint" }, "Hinweis: " + f.hinweis) : null,
+      f.quelle ? h("p", { class: "src" }, "Quelle: " + f.quelle) : null,
+      h("div", { class: "actions", style: "margin-top:4px" },
+        f.aus ? null : h("button", { class: "btn", type: "button", onclick: () => anmerkenDialog(f) }, "Diese Frage anmerken"),
+        h("button", { class: "btn ghost", type: "button", onclick: schliesseDialog }, "Schließen"))));
+}
+function trefferListe(treffer, onWahl, gewaehlt) {
+  return h("div", { class: "treffer" }, treffer.map(e => {
+    if (e.art === "thema") {
+      const th = S.themen[e.id];
+      return h("div", { class: "treffer-i" }, h("span", { class: "chip acc" }, "Thema"), h("span", { class: "t" }, th.titel + " (" + th.fragen.length + " Fragen)"),
+        h("button", { class: "linkbtn", type: "button", onclick: () => { schliesseDialog(); go("thema", e.id); } }, "öffnen"));
+    }
+    const f = S.fragen[e.id];
+    return h("div", { class: "treffer-i" + (gewaehlt === e.id ? " sel" : "") },
+      onWahl ? h("input", { type: "radio", name: "doppel", checked: gewaehlt === e.id, "aria-label": "Doppelt zu " + e.id.toUpperCase(), onchange: () => onWahl(e.id) }) : h("span", { class: "tag" }, e.id.toUpperCase()),
+      h("span", { class: "t" }, onWahl ? e.id.toUpperCase() + " " + f.frage : f.frage, h("span", { class: "small muted", style: "display:block" }, "Lösung: " + loesungText(f).slice(0, 140))),
+      onWahl ? null : h("button", { class: "linkbtn", type: "button", onclick: () => frageDialog(e.id) }, "ansehen"));
+  }));
+}
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+
+/* ---------- Frage anmerken ---------- */
+const ANMERK_TYPEN = [
+  ["pruefen", "Antwort stimmt nicht", "Lösung oder Erklärung ist vermutlich falsch"],
+  ["unklar", "Unklar", "Frage oder Antwort missverständlich"],
+  ["doppelt", "Doppelt", "Diese Frage gibt es so schon"],
+  ["ergaenzung", "Ergänzung", "Etwas fehlt oder ist neu"],
+];
+function anmerkenDialog(f, vorTyp) {
+  let typ = vorTyp || "pruefen", betrifft = null, doppeltZu = null;
+  const typBox = h("div", { class: "typwahl", role: "radiogroup", "aria-label": "Art der Anmerkung" });
+  const extra = h("div", { class: "stack", style: "gap:8px" });
+  const ta = h("textarea", { rows: 3 });
+  const pause = h("input", { type: "checkbox" });
+  const pauseLabel = h("label", { class: "conf", style: "margin-top:0" }, pause, "Bis zur Prüfung nicht mehr abfragen");
+  const PLATZ = { pruefen: "Was stimmt deiner Meinung nach nicht? Gern mit Quelle, z. B. Preisliste oder Mail von Laurin.", unklar: "Was ist unklar?", doppelt: "Optional: Was ist gleich?", ergaenzung: "Was fehlt oder ist neu? Gern mit Quelle." };
+  function zeichne() {
+    typBox.replaceChildren(...ANMERK_TYPEN.map(([k, txt, sub]) => h("button", { type: "button", role: "radio", "aria-checked": typ === k ? "true" : "false", class: typ === k ? "sel" : "", onclick: () => { typ = k; pause.checked = typ === "pruefen" || typ === "doppelt"; zeichne(); } }, h("b", null, txt), h("span", null, sub))));
+    ta.placeholder = PLATZ[typ];
+    const teile = [];
+    if (typ === "pruefen" && (f.typ === "single" || f.typ === "multi")) {
+      const loes = new Set(f.typ === "multi" ? f.loesung : [f.loesung]);
+      const sel = h("select", { "aria-label": "Welche Antwort betrifft es?" },
+        h("option", { value: "" }, "Die Lösung bzw. die ganze Frage"),
+        f.optionen.map((o, i) => h("option", { value: String(i), selected: betrifft === "o" + i }, (loes.has(i) ? "Als richtig markiert: " : "Als falsch markiert: ") + o)),
+        h("option", { value: "e", selected: betrifft === "e" }, "Die Erklärung"));
+      sel.addEventListener("change", () => { betrifft = sel.value === "" ? null : sel.value === "e" ? "e" : "o" + sel.value; });
+      teile.push(h("span", { class: "small" }, "Welche Antwort betrifft es?"), sel);
+    }
+    if (typ === "doppelt") {
+      const kand = (S.verwandt[S.verwandtVon[f.id]] || []).filter(q => q !== f.id).map(q => ({ art: "frage", id: q, s: 1 }))
+        .concat(aehnliche(f.frage + " " + loesungText(f), 8, f.id, 0.1).filter(e => e.art === "frage"))
+        .filter((e, i, a) => a.findIndex(x => x.id === e.id) === i).slice(0, 5);
+      const andere = h("input", { type: "text", placeholder: "Andere Frage-ID, z. B. T03-09", autocomplete: "off", "aria-label": "Andere Frage-ID" });
+      andere.addEventListener("input", () => { const v = andere.value.trim().toLowerCase(); doppeltZu = /^t\d{2}-\d{2}$/.test(v) ? v : null; });
+      teile.push(h("span", { class: "small" }, kand.length ? "Zu welcher Frage? Diese sind ähnlich:" : "Zu welcher Frage?"),
+        kand.length ? trefferListe(kand, (q) => { doppeltZu = q; andere.value = ""; zeichne(); }, doppeltZu) : null, andere);
+    }
+    extra.replaceChildren(...teile);
+  }
+  pause.checked = typ === "pruefen" || typ === "doppelt";
+  zeichne();
+  const speichern = () => {
+    const text = ta.value.trim();
+    if (!text && typ !== "doppelt") { toast("Bitte kurz beschreiben."); ta.focus(); return; }
+    if (typ === "doppelt" && !doppeltZu && !text) { toast("Wähle die andere Frage oder beschreibe sie kurz."); return; }
+    let bt = null;
+    if (betrifft === "e") bt = "die Erklärung";
+    else if (betrifft) { const i = Number(betrifft.slice(1)); bt = "Antwortmöglichkeit „" + f.optionen[i] + "“ (" + ((f.typ === "multi" ? f.loesung.includes(i) : f.loesung === i) ? "als richtig markiert" : "als falsch markiert") + ")"; }
+    speichereNotiz({ art: "frage", typ, frage_id: f.id, test: S.testVon[f.id], frage: f.frage.slice(0, 200), betrifft: bt, doppelt_zu: doppeltZu, text, pause: pause.checked, datum: nowIso(), status: "offen" },
+      "Anmerkung gespeichert" + (pause.checked ? ", die Frage pausiert bis zur Prüfung." : ". Claude prüft sie beim nächsten Einarbeiten."));
+    schliesseDialog(); render();
+  };
+  oeffneDialog("Frage anmerken",
+    h("p", { class: "small muted", style: "margin:0" }, f.id.toUpperCase() + " · " + f.frage),
+    typBox, extra,
+    h("label", { class: "small" }, "Deine Anmerkung"), ta,
+    pauseLabel,
+    h("div", { class: "actions", style: "margin-top:4px" },
+      h("button", { class: "btn primary", type: "button", onclick: speichern }, "Speichern"),
+      h("button", { class: "btn ghost", type: "button", onclick: schliesseDialog }, "Abbrechen")),
+    h("p", { class: "small muted" }, "Claude prüft deine Anmerkung beim nächsten Einarbeiten und antwortet dir unter „Notizen“."));
+}
+function anmerkenLink(f) {
+  const offen = offeneAnmerkungen(f.id);
+  return h("div", { class: "note-box row" },
+    h("button", { class: "linkbtn", type: "button", onclick: () => anmerkenDialog(f) }, "Anmerken: falsch, unklar oder doppelt?"),
+    offen.length ? h("button", { class: "linkbtn small", type: "button", onclick: () => go("notizen") }, offen.length === 1 ? "1 offene Anmerkung" : offen.length + " offene Anmerkungen") : null);
+}
+
+/* ---------- Hinzufügen: neue Frage, neues Thema, Erkenntnis ---------- */
+const WUNSCH_TYPEN = [["frage", "Neue Frage"], ["thema", "Neues Thema"], ["erkenntnis", "Erkenntnis"]];
+function hinzufuegenDialog(vorTyp) {
+  let typ = vorTyp || "frage";
+  const ta = h("textarea", { rows: 3 });
+  const antwort = h("input", { type: "text", placeholder: "Antwort, falls du sie weißt (optional)", autocomplete: "off" });
+  const quelle = h("input", { type: "text", placeholder: "Quelle (optional), z. B. Mail von Laurin", autocomplete: "off" });
+  const typBox = h("div", { class: "seg-ctl", role: "group", "aria-label": "Was möchtest du hinzufügen?" });
+  const felder = h("div", { class: "stack", style: "gap:8px" });
+  const treffer = h("div", { class: "stack", style: "gap:6px" });
+  const PLATZ = { frage: "Was soll gefragt werden? z. B. „Was ist der Unterschied zwischen Seller und Vendor bei Amazon?“", thema: "Welches Thema fehlt dir? z. B. „Kaufland: Anbindung, Provision und Besonderheiten“", erkenntnis: "Was ist neu? z. B. „Laut Laurin gilt bei OTTO ab 2027 eine neue Provision …“" };
+  let letzte = [];
+  const pruefe = () => {
+    const text = (ta.value + " " + antwort.value).trim();
+    if (text.length < 6) { treffer.replaceChildren(); letzte = []; return; }
+    letzte = aehnliche(text, 8);
+    const fr = letzte.filter(e => e.art === "frage").slice(0, 5), th = letzte.filter(e => e.art === "thema").slice(0, 2);
+    treffer.replaceChildren(
+      fr.length || th.length
+        ? h("p", { class: "small", style: "margin:0" }, h("b", null, "Gibt es vielleicht schon: "), "Schau kurz drüber. Wenn es dabei ist, brauchst du nichts einzutragen.")
+        : h("p", { class: "small muted", style: "margin:0" }, "Nichts Ähnliches gefunden."),
+      th.length ? trefferListe(th) : null,
+      fr.length ? trefferListe(fr) : null);
+  };
+  const pruefeSpaeter = debounce(pruefe, 250);
+  ta.addEventListener("input", pruefeSpaeter); antwort.addEventListener("input", pruefeSpaeter);
+  function zeichne() {
+    typBox.replaceChildren(...WUNSCH_TYPEN.map(([k, txt]) => h("button", { type: "button", "aria-pressed": typ === k ? "true" : "false", onclick: () => { typ = k; zeichne(); } }, txt)));
+    ta.placeholder = PLATZ[typ];
+    felder.replaceChildren(ta, typ === "frage" ? antwort : null, quelle);
+  }
+  zeichne();
+  const speichern = () => {
+    const text = ta.value.trim(); if (!text) { toast("Bitte etwas eintragen."); ta.focus(); return; }
+    pruefe();
+    const aeh = letzte.filter(e => e.s >= 0.2).slice(0, 4).map(e => e.art === "thema" ? "Thema " + S.themen[e.id].titel : e.id);
+    speichereNotiz({ art: typ === "erkenntnis" ? "erkenntnis" : "wunsch", typ, text, antwort: typ === "frage" ? antwort.value.trim() || undefined : undefined, quelle: quelle.value.trim() || undefined, aehnlich: aeh.length ? aeh : undefined, datum: nowIso(), status: "offen" },
+      typ === "erkenntnis" ? "Erkenntnis gespeichert." : "Wunsch gespeichert. Claude prüft vor dem Einbau, ob es das schon gibt.");
+    schliesseDialog(); if (S.ansicht === "notizen") render();
+  };
+  oeffneDialog("Etwas hinzufügen",
+    typBox, felder, treffer,
+    h("div", { class: "actions", style: "margin-top:4px" },
+      h("button", { class: "btn primary", type: "button", onclick: speichern }, "Speichern"),
+      h("button", { class: "btn ghost", type: "button", onclick: schliesseDialog }, "Abbrechen")),
+    h("p", { class: "small muted" }, "Claude prüft beim Einarbeiten noch einmal genau, ob es das schon gibt, und antwortet dir unter „Notizen“."));
+}
+
+/* ---------- Ansicht Notizen ---------- */
 function notizenText() {
-  const alle = Object.values(S.notizen).sort((a, b) => (a.datum < b.datum ? -1 : 1));
-  return ["Notizen aus der HBOD Lern-App (Fragenkatalog " + S.daten.version + ")", ""].concat(alle.map(n => "[" + (n.status || "offen") + "] " + String(n.datum || "").slice(0, 10) + " " + (n.frage_id ? n.frage_id.toUpperCase() + " (" + n.frage + ") " : "") + "– " + n.text)).join("\n");
+  const alle = Object.values(S.notizen).filter(n => notizStatus(n) !== "geloescht").sort((a, b) => (a.datum < b.datum ? -1 : 1));
+  return ["Notizen aus der HBOD Lern-App (Fragenkatalog " + S.daten.version + ")", ""].concat(alle.map(n => {
+    const z = ["[" + n.id + "] " + notizStatus(n) + " · " + String(n.datum || "").slice(0, 10) + " · " + NOTIZ_TYP[notizTyp(n)] + (n.frage_id ? " · " + n.frage_id.toUpperCase() : "")];
+    if (n.frage) z.push("  Frage: " + n.frage);
+    if (n.betrifft) z.push("  Betrifft: " + n.betrifft);
+    if (n.doppelt_zu) z.push("  Doppelt zu: " + n.doppelt_zu.toUpperCase());
+    if (n.text) z.push("  " + n.text);
+    if (n.antwort) z.push("  Antwort: " + n.antwort);
+    if (n.quelle) z.push("  Quelle: " + n.quelle);
+    if (rueckVon(n)) z.push("  Claude: " + rueckVon(n).text);
+    return z.join("\n");
+  })).join("\n");
+}
+let notizFilter = "offen";
+function notizKarte(n) {
+  const typ = notizTyp(n); const st = notizStatus(n); const r = rueckVon(n);
+  return h("div", { class: "note" + (st === "erledigt" ? " erledigt" : "") },
+    h("div", { class: "row small muted" },
+      h("span", { class: "mono" }, fmtDate(n.datum)),
+      h("span", { class: "chip " + NOTIZ_FARBE[typ] }, NOTIZ_TYP[typ]),
+      n.frage_id ? h("button", { class: "tag", type: "button", style: "border:0;cursor:pointer", onclick: () => frageDialog(n.frage_id) }, n.frage_id.toUpperCase()) : null,
+      n.pause && st === "offen" ? h("span", { class: "chip" }, "pausiert") : null,
+      h("span", { class: "spacer" }),
+      h("button", { class: "chip" + (st === "erledigt" ? " ok" : ""), type: "button", style: "cursor:pointer", title: "Status umschalten", onclick: () => setzeNotizStatus(n, st === "erledigt" ? "offen" : "erledigt") }, st === "erledigt" ? "erledigt" : "offen")),
+    n.frage ? h("p", { class: "small muted" }, n.frage) : null,
+    n.betrifft ? h("p", { class: "small" }, h("b", null, "Betrifft: "), n.betrifft) : null,
+    n.doppelt_zu ? h("p", { class: "small" }, h("b", null, "Doppelt zu: "), h("button", { class: "linkbtn", type: "button", onclick: () => frageDialog(n.doppelt_zu) }, n.doppelt_zu.toUpperCase() + (S.alleFragen[n.doppelt_zu] ? " " + S.alleFragen[n.doppelt_zu].frage.slice(0, 90) : ""))) : null,
+    n.text ? h("p", null, n.text) : null,
+    n.antwort ? h("p", { class: "small" }, h("b", null, "Antwort: "), n.antwort) : null,
+    n.quelle ? h("p", { class: "src" }, "Quelle: " + n.quelle) : null,
+    r ? h("div", { class: "rueck" }, h("span", { class: "label" }, "Claude · " + fmtDate(r.zeit)), h("p", null, r.text)) : null,
+    h("div", { class: "row" }, h("span", { class: "spacer" }), h("button", { class: "linkbtn small", type: "button", onclick: () => { if (confirm("Diese Notiz löschen?")) setzeNotizStatus(n, "geloescht"); } }, "Löschen")));
 }
 function viewNotizen() {
-  const alle = Object.values(S.notizen).sort((a, b) => (a.datum < b.datum ? 1 : -1));
-  const ta = h("textarea", { rows: 4, id: "neue-notiz", placeholder: "Neue Erkenntnis, z. B. \"Laut Laurin gilt bei OTTO ab 2027 eine neue Provision …\"" });
-  const save = h("button", { class: "btn primary", type: "button" }, "Speichern");
-  save.addEventListener("click", () => {
-    const text = ta.value.trim(); if (!text) { toast("Bitte etwas eintragen."); return; }
-    speichereNotiz({ art: "erkenntnis", text, datum: nowIso(), status: "offen" });
-    render();
-  });
-  const offen = alle.filter(n => n.status !== "erledigt").length;
+  const alle = Object.values(S.notizen).filter(n => n && notizStatus(n) !== "geloescht").sort((a, b) => (a.datum < b.datum ? 1 : -1));
+  const offen = alle.filter(n => notizStatus(n) === "offen"), erledigt = alle.filter(n => notizStatus(n) === "erledigt");
+  const liste = notizFilter === "offen" ? offen : notizFilter === "erledigt" ? erledigt : alle;
+  const neuVonClaude = erledigt.filter(n => rueckVon(n) && n.status !== "erledigt").length;
   return h("section", { class: "stack" },
-    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Für Claude"), h("h1", null, "Notizen und neue Erkenntnisse"),
-      h("p", { class: "muted" }, "Notiere hier, was neu ist oder nicht stimmt. Gib die Notizen dann Claude im Projekt HBOD, z. B. mit \"Arbeite meine Notizen aus der Lern-App ein\" und dem kopierten Text oder dem Bericht-Link.")),
-    h("div", { class: "panel stack" }, h("label", { for: "neue-notiz", class: "label" }, "Neue Erkenntnis"), ta, h("div", { class: "row" }, save)),
-    alle.length ? h("div", { class: "row" }, h("span", { class: "small muted" }, offen + " offen, " + (alle.length - offen) + " erledigt"), h("span", { class: "spacer" }), h("button", { class: "btn ghost", type: "button", onclick: () => kopiere(notizenText()) }, "Alle Notizen kopieren")) : null,
-    alle.length ? h("div", { class: "notes" }, alle.map(n => h("div", { class: "note" },
-      h("div", { class: "row small muted" }, h("span", { class: "mono" }, fmtDate(n.datum)), n.frage_id ? h("span", { class: "tag" }, n.frage_id.toUpperCase()) : h("span", { class: "chip acc" }, "Erkenntnis"), h("span", { class: "spacer" }),
-        h("button", { class: "chip" + (n.status === "erledigt" ? " ok" : ""), type: "button", style: "cursor:pointer", onclick: () => setzeNotizStatus(n, n.status === "erledigt" ? "offen" : "erledigt"), title: "Status umschalten" }, n.status === "erledigt" ? "erledigt" : "offen")),
-      n.frage ? h("p", { class: "small muted" }, n.frage) : null,
-      h("p", null, n.text))))
-      : h("div", { class: "panel empty" }, "Noch keine Notizen."));
+    h("div", { class: "sheet-head" }, h("span", { class: "label" }, "Für Claude"), h("h1", null, "Notizen und Anmerkungen"),
+      h("p", { class: "muted" }, "Hier landet alles, was du anmerkst oder hinzufügen möchtest. Claude prüft es beim Einarbeiten, baut es in den Katalog ein und antwortet dir direkt hier an der Notiz.")),
+    h("div", { class: "panel stack" },
+      h("div", { class: "actions", style: "margin-top:0" },
+        h("button", { class: "btn primary", type: "button", onclick: () => hinzufuegenDialog("frage") }, "Frage oder Thema wünschen"),
+        h("button", { class: "btn", type: "button", onclick: () => hinzufuegenDialog("erkenntnis") }, "Erkenntnis notieren")),
+      h("p", { class: "small muted" }, "Eine bestimmte Frage merkst du direkt unter der Frage an: „Anmerken: falsch, unklar oder doppelt?“. Den Plus-Knopf unten rechts gibt es auf jeder Seite."),
+      h("details", null, h("summary", null, "So kommt alles in die App"),
+        h("ol", { class: "small", style: "margin:8px 0 0;padding-left:1.2em;display:grid;gap:4px" },
+          h("li", null, "Unter „Geräte“ den Bericht-Link kopieren. Darin stehen alle offenen Anmerkungen mit Nummer."),
+          h("li", null, "In Claude Code (Repository NilsLerrnApp) schreiben: „Arbeite meine offenen Anmerkungen aus der Lern-App ein“ und den Link einfügen."),
+          h("li", null, "Claude prüft jede Anmerkung, sucht vor jedem Wunsch im Katalog, ob es das schon gibt, und baut ein, was fehlt."),
+          h("li", null, "Nach dem Veröffentlichen steht Claudes Antwort hier an deiner Notiz, und sie gilt als erledigt. Pausierte Fragen kommen dann wieder dran.")))),
+    neuVonClaude ? h("p", { class: "hint" }, neuVonClaude === 1 ? "Claude hat auf 1 Notiz geantwortet." : "Claude hat auf " + neuVonClaude + " Notizen geantwortet.") : null,
+    alle.length ? h("div", { class: "row" },
+      h("div", { class: "seg-ctl", role: "group", "aria-label": "Filter" },
+        [["offen", "Offen (" + offen.length + ")"], ["erledigt", "Erledigt (" + erledigt.length + ")"], ["alle", "Alle"]].map(([k, t]) => h("button", { type: "button", "aria-pressed": notizFilter === k ? "true" : "false", onclick: () => { notizFilter = k; render(); } }, t))),
+      h("span", { class: "spacer" }),
+      h("button", { class: "btn ghost", type: "button", onclick: () => kopiere(notizenText()) }, "Alle kopieren")) : null,
+    liste.length ? h("div", { class: "notes" }, liste.map(notizKarte))
+      : h("div", { class: "panel empty" }, alle.length ? (notizFilter === "offen" ? "Keine offenen Notizen." : "Hier ist noch nichts.") : "Noch keine Notizen."));
 }
 
 /* ================= Geräte & Speicherung ================= */
@@ -1528,7 +1893,7 @@ function resetPanel() {
     h("div", { class: "stack", style: "margin-top:10px" },
       h("p", { class: "small" }, "Code auf diesem Gerät entfernen: Der Fortschritt bleibt auf dem Server und auf diesem Gerät, wird hier aber nicht mehr abgeglichen."),
       h("div", { class: "actions" }, h("button", { class: "btn ghost", type: "button", onclick: () => { S.code = null; S.lesetoken = null; S.sync.status = "lokal"; lsSave(); renderStatus(); render(); toast("Code von diesem Gerät entfernt."); } }, "Code entfernen")),
-      h("p", { class: "small" }, "Fortschritt zurücksetzen: Alle Antworten und Durchgänge werden auf allen Geräten gelöscht. Notizen bleiben."),
+      h("p", { class: "small" }, "Fortschritt zurücksetzen: Alle Antworten und Durchgänge werden auf allen Geräten gelöscht. Notizen und Bewertungen bleiben."),
       h("div", { class: "actions" }, h("button", { class: "btn danger", type: "button", onclick: async () => {
         if (!S.resetBereit) { S.resetBereit = true; toast("Wirklich alles zurücksetzen? Tippe zur Bestätigung noch einmal."); setTimeout(() => { S.resetBereit = false; }, 6000); return; }
         S.resetBereit = false;
@@ -1699,14 +2064,21 @@ function viewHilfe() {
         h("li", null, "Ein ganzes Thema am Stück: unter \"Übersicht\" einen Test öffnen. Jeder Test ist ein eigener kurzer Bogen."),
         h("li", null, "Erst selbst antworten, dann die Lösung ansehen. Das Abrufen aus dem Kopf festigt Wissen am stärksten."),
         h("li", null, "Wenn du rätst, hak \"Ich bin unsicher\" an. Dann kommt die Frage öfter, bis sie sicher sitzt."),
+        h("li", null, "Bewerte nach dem Antworten, wie schwer die Frage für dich war: Leicht, Mittel oder Schwer. Unter \"Heute\", im Thema und bei \"Fehler\" kannst du dann nur die schweren lernen."),
         h("li", null, "Lies bei Fehlern die Erklärung und erkläre sie dir in eigenen Worten. Der Lernzettel eines Tests hilft dabei."),
-        h("li", null, "Die Tagesrunde mischt Themen. Das ist anstrengender, aber du lernst dabei, Begriffe sauber zu unterscheiden."),
+        h("li", null, "Die Tagesrunde mischt Wiederholungen und Neues: höchstens 3 von 5 Fragen sind Wiederholungen. Dieselbe Frage und Fragen zur gleichen Tatsache kommen nicht zweimal am selben Tag."),
         h("li", null, "Wenn die Tagesrunden gut laufen, mach eine Prüfungssimulation als Gesamtprobe.")),
       h("h3", null, "Wiederholungsplan"),
       h("ul", null,
-        h("li", null, "Jede Frage liegt in einem von fünf Fächern. Richtig: ein Fach weiter. Falsch: zurück in Fach 1."),
-        h("li", null, "Fach 1 kommt nach 1 Tag wieder, Fach 2 nach 3, Fach 3 nach 7, Fach 4 nach 14 und Fach 5 nach 30 Tagen."),
-        h("li", null, "Gemeistert heißt: dreimal zum Termin richtig, also frühestens nach vier Tagen. Wer vor dem Termin übt, festigt das Wissen, die Frage steigt aber erst am Termin auf.")),
+        h("li", null, "Jede Frage liegt in einem von fünf Fächern. Richtig: ein Fach weiter. Falsch: zurück in Fach 1 und am nächsten Tag wieder."),
+        h("li", null, "Fach 1 kommt nach 2 Tagen wieder, Fach 2 nach 4, Fach 3 nach 8, Fach 4 nach 15 und Fach 5 nach 30 Tagen."),
+        h("li", null, "Bewertung: Schwer hält die Frage in Fach 1 oder 2, direkt nach dem Bewerten kommt sie am nächsten Tag wieder. Leicht lässt sie zum Termin ein Fach mehr aufsteigen. Mittel ändert nichts."),
+        h("li", null, "Gemeistert heißt: dreimal zum Termin richtig, also frühestens nach sechs Tagen. Wer vor dem Termin übt, festigt das Wissen, die Frage steigt aber erst am Termin auf.")),
+      h("h3", null, "Anmerken und hinzufügen"),
+      h("ul", null,
+        h("li", null, "Unter jeder Frage: \"Anmerken\", wenn eine Antwort nicht stimmt, etwas unklar ist oder die Frage doppelt vorkommt. Auf Wunsch wird die Frage bis zur Prüfung nicht mehr abgefragt."),
+        h("li", null, "Der Plus-Knopf unten rechts öffnet ein kleines Fenster für neue Fragen, Themen oder Erkenntnisse. Die App zeigt sofort, was es dazu schon gibt."),
+        h("li", null, "Alles steht unter \"Notizen\". Claude prüft es beim Einarbeiten, sucht vor jedem Einbau, ob es das schon gibt, und antwortet dir direkt an der Notiz. Dann gilt sie als erledigt.")),
       h("h3", null, "Am PC"),
       h("ul", null,
         h("li", null, "Mit den Tasten 1 bis 9 wählst du eine Antwort. Bei Richtig oder falsch: 1 = Richtig, 2 = Falsch."),
@@ -1726,7 +2098,7 @@ function viewHilfe() {
         h("li", null, "\"In Claude besprechen\" kopiert Aufgabe, deine Antwort und die Musterlösung und öffnet deinen Claude-Chat. Claude sagt dir dann, was gut ist und was fehlt.")),
       h("h3", null, "Erweitern und korrigieren"),
       h("ul", null,
-        h("li", null, "Fehler unter der Frage melden oder neue Erkenntnisse unter \"Notizen\" eintragen."),
+        h("li", null, "Unter der Frage anmerken oder mit dem Plus-Knopf etwas hinzufügen. Den Bericht-Link unter \"Geräte\" gibst du Claude zum Einarbeiten."),
         h("li", null, "Claude arbeitet Notizen und neue Dokumente in den Fragenkatalog ein und lädt die neue Version zu GitHub hoch. Überarbeitete Fragen zählen danach neu, alles andere bleibt erhalten.")),
       h("h3", null, "Wichtig"),
       h("ul", null,

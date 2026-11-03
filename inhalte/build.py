@@ -1,4 +1,5 @@
-"""Baut public/fragen.json aus den Fragen-Dateien q_a.py bis q_f.py und den Themen in themen.py.
+"""Baut public/fragen.json aus den Fragen-Dateien q_a.py bis q_f.py, den Themen (themen.py),
+der Pflegeliste für doppelte und verwandte Fragen (pflege.py) und Claudes Rückmeldungen (rueckmeldungen.py).
 
 Aufruf (im Ordner inhalte):  python3 build.py
 
@@ -16,12 +17,23 @@ import dsl  # noqa: E402
 for m in ["q_a", "q_b", "q_c", "q_d", "q_e", "q_f"]:
     importlib.import_module(m)
 import themen  # noqa: E402
+import pflege  # noqa: E402
+import rueckmeldungen  # noqa: E402
+import aehnlich  # noqa: E402
 
-VERSION = "2.2"
+VERSION = "2.3"
 STAND = "2026-11-03"
 
 # Was sich geändert hat (neueste zuerst). Wird in der App unter "Hilfe" angezeigt.
 AENDERUNGEN = [
+    {"datum": "2026-11-03", "version": "2.3", "punkte": [
+        "Neu: Fragen bewerten mit Leicht, Mittel oder Schwer. Schwere Fragen kommen öfter, leichte seltener. Unter Heute, im Thema und bei Fehler kannst du nur die schweren lernen.",
+        "Neu: Der Plus-Knopf unten rechts öffnet ein kleines Fenster für neue Fragen, Themen oder Erkenntnisse. Die App zeigt dir sofort, was es dazu schon gibt. Claude prüft das vor dem Einbau noch einmal genau.",
+        "Neu: \"Anmerken\" unter jeder Frage, z. B. wenn eine Antwort nicht stimmt, etwas unklar ist oder eine Frage doppelt vorkommt. Auf Wunsch wird die Frage bis zur Prüfung nicht mehr abgefragt.",
+        "Neu: Claude antwortet direkt an deiner Anmerkung in der App. Sie gilt dann als erledigt, du kannst sie wieder öffnen.",
+        "Tagesrunde: höchstens 3 von 5 Fragen sind Wiederholungen, mindestens 2 sind neu. Richtige Antworten kommen nach 2, 4, 8, 15 und 30 Tagen wieder. Dieselbe Frage kommt nicht zweimal am selben Tag.",
+        "Doppelte Fragen geprüft: 5 fast gleiche ausgeblendet (T02-10, T12-08, T13-11, T28-07, T31-10). 23 Gruppen ähnlicher Fragen kommen nie mehr am selben Tag dran.",
+    ]},
     {"datum": "2026-11-03", "version": "2.2", "punkte": [
         "Neu: Themen zum Vertiefen, z. B. GMV, Provision, Retouren, Zalando oder EPR. Jedes Thema hat eine Kurzerklärung und sammelt die passenden Fragen aus allen Tests. Du lernst es in Runden zu 5 Fragen.",
         "Neu: Unter jeder Erklärung führt \"Thema vertiefen\" direkt zum passenden Thema.",
@@ -79,6 +91,54 @@ for t in dsl.TESTS:
                 fehler.append(f"fehlt {k} " + f["id"])
         f["fp"] = fingerabdruck(f)
 
+# ---------- Doppelte und verwandte Fragen (pflege.py) ----------
+nach_id = {f["id"]: f for t in dsl.TESTS for f in t["fragen"]}
+for q, grund in pflege.AUSBLENDEN.items():
+    if q not in nach_id:
+        fehler.append("AUSBLENDEN: unbekannte Frage " + q)
+    elif not grund:
+        fehler.append("AUSBLENDEN: Grund fehlt bei " + q)
+    else:
+        nach_id[q]["aus"] = grund
+verwandt_von = {}
+for i, (gruppe, titel) in enumerate(pflege.VERWANDT, 1):
+    qs = gruppe.split()
+    if len(qs) < 2 or not titel:
+        fehler.append(f"VERWANDT: Gruppe {i} braucht mindestens 2 Fragen und einen Titel")
+    for q in qs:
+        if q not in nach_id:
+            fehler.append(f"VERWANDT: unbekannte Frage {q}")
+        elif q in verwandt_von:
+            fehler.append(f"VERWANDT: {q} steht in mehreren Gruppen")
+        elif nach_id[q].get("aus"):
+            fehler.append(f"VERWANDT: {q} ist ausgeblendet")
+        else:
+            verwandt_von[q] = f"v{i:02d}"
+            nach_id[q]["verwandt"] = f"v{i:02d}"
+geprueft = set()
+for p in pflege.GEPRUEFT:
+    qs = p.split()
+    if len(qs) != 2 or any(q not in nach_id for q in qs):
+        fehler.append("GEPRUEFT: ungültiges Paar " + p)
+    geprueft.add(frozenset(qs))
+sichtbar = [f for f in nach_id.values() if not f.get("aus")]
+neue_doppel = aehnlich.moegliche_doppel(sichtbar, verwandt_von, geprueft)
+
+# ---------- Rückmeldungen von Claude ----------
+rueck = {}
+for r in rueckmeldungen.RUECKMELDUNGEN:
+    if not re.fullmatch(r"[a-z0-9]{4,40}", r.get("id", "")):
+        fehler.append("Rückmeldung: ungültige Notiz-ID " + str(r.get("id")))
+    elif not re.fullmatch(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?Z?", r.get("zeit", "")):
+        fehler.append(f"Rückmeldung {r['id']}: Zeit im Format 2026-11-04T09:30:00Z angeben")
+    elif not r.get("text"):
+        fehler.append(f"Rückmeldung {r['id']}: Text fehlt")
+    else:
+        z = r["zeit"] if r["zeit"].endswith("Z") else r["zeit"] + "Z"
+        if len(z) == 17:
+            z = z[:-1] + ":00Z"
+        rueck[r["id"]] = {"zeit": z, "text": r["text"]}
+
 # ---------- Themen prüfen ----------
 themen_ids, in_thema = set(), set()
 for th in themen.THEMEN:
@@ -98,6 +158,8 @@ for th in themen.THEMEN:
     for q in th["fragen"]:
         if q not in ids:
             fehler.append(f"Thema {tid}: unbekannte Frage {q}")
+        elif nach_id[q].get("aus"):
+            fehler.append(f"Thema {tid}: {q} ist ausgeblendet")
         in_thema.add(q)
     if len(th["fragen"]) < 6:
         fehler.append(f"Thema {tid}: nur {len(th['fragen'])} Fragen (mindestens 6)")
@@ -112,12 +174,20 @@ daten = {
     "tests": dsl.TESTS,
     "themengruppen": themen.GRUPPEN,
     "themen": themen.THEMEN,
+    "verwandt": [{"id": f"v{i:02d}", "titel": titel, "fragen": g.split()} for i, (g, titel) in enumerate(pflege.VERWANDT, 1)],
+    "rueckmeldungen": rueck,
 }
 ziel = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HIER, "..", "public", "fragen.json")
 with open(ziel, "w", encoding="utf-8") as fh:
     json.dump(daten, fh, ensure_ascii=False, separators=(",", ":"))
 print("Tests:", len(dsl.TESTS), "Fragen:", n, typen)
-print("Themen:", len(themen.THEMEN), "· Fragen ohne Thema:", len(ids - in_thema))
+print("Sichtbar:", len(sichtbar), "· ausgeblendet:", len(pflege.AUSBLENDEN), "· verwandte Gruppen:", len(pflege.VERWANDT), "· Rückmeldungen:", len(rueck))
+print("Themen:", len(themen.THEMEN), "· sichtbare Fragen ohne Thema:", len({f["id"] for f in sichtbar} - in_thema))
+if neue_doppel:
+    print(f"Hinweis: {len(neue_doppel)} mögliche neue Doppel, z. B.", ", ".join(f"{a.upper()}/{b.upper()}" for _, a, b in neue_doppel[:5]),
+          "· Details: python3 inhalte/doppelte.py")
+else:
+    print("Mögliche neue Doppel: keine")
 print("Fehler:", fehler or "keine")
 if fehler:
     sys.exit(1)

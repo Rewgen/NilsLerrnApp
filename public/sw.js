@@ -1,5 +1,5 @@
 // Service Worker: App offline nutzbar machen. Netzwerk zuerst, damit Korrekturen sofort ankommen.
-const CACHE = "hbod-lernapp-v3";
+const CACHE = "hbod-lernapp-v4";
 const SHELL = ["/", "/index.html", "/fragen.json", "/manifest.webmanifest", "/icon.svg", "/icon-192.png"];
 
 self.addEventListener("install", (e) => {
