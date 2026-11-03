@@ -17,7 +17,7 @@ export const schluessel = async (code) => "u-" + (await sha("hbod-lernapp|" + co
 export const lesetoken = async (code) => (await sha("hbod-lernapp-lesen|" + code)).slice(0, 32);
 
 export function leer() {
-  return { version: 1, antworten: {}, laeufe: {}, notizen: {}, aktivitaet: {}, einstellungen: null, lauf: null, resetZeit: "", erstellt: jetzt(), aktualisiert: "" };
+  return { version: 1, antworten: {}, laeufe: {}, notizen: {}, bewertungen: {}, aktivitaet: {}, einstellungen: null, lauf: null, resetZeit: "", erstellt: jetzt(), aktualisiert: "" };
 }
 
 export function zusammenfuehren(doc, d) {
@@ -45,6 +45,13 @@ export function zusammenfuehren(doc, d) {
     const cur = doc.notizen[id];
     if (!cur || neuer(n.zeit, cur.zeit)) doc.notizen[id] = n;
   }
+  // Bewertungen (leicht/mittel/schwer) je Frage: die neueste gewinnt. Bleiben beim Zurücksetzen erhalten.
+  if (!doc.bewertungen || typeof doc.bewertungen !== "object") doc.bewertungen = {};
+  for (const [q, b] of Object.entries(d.bewertungen || {})) {
+    if (!QID_RE.test(q) || !b || typeof b !== "object" || !(b.stufe == null || ["leicht", "mittel", "schwer"].includes(b.stufe))) continue;
+    const cur = doc.bewertungen[q];
+    if (!cur || neuer(b.zeit, cur.zeit)) doc.bewertungen[q] = b;
+  }
   for (const [tag, anz] of Object.entries(d.aktivitaet || {})) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(tag)) continue;
     if (doc.resetZeit && tag < doc.resetZeit.slice(0, 10)) continue;
@@ -57,7 +64,7 @@ export function zusammenfuehren(doc, d) {
 
 function zuruecksetzen(doc) {
   const z = jetzt();
-  return Object.assign(leer(), { notizen: doc.notizen || {}, einstellungen: doc.einstellungen || null, erstellt: doc.erstellt || z, resetZeit: z });
+  return Object.assign(leer(), { notizen: doc.notizen || {}, bewertungen: doc.bewertungen || {}, einstellungen: doc.einstellungen || null, erstellt: doc.erstellt || z, resetZeit: z });
 }
 
 const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
@@ -111,9 +118,29 @@ function loesungText(f) {
   return "";
 }
 
+// ---------- Notizen: Typ und Status (gleich wie in der App) ----------
+export const NOTIZ_TYP = { pruefen: "Antwort prüfen", unklar: "Unklar", doppelt: "Doppelt", ergaenzung: "Ergänzung", frage: "Wunsch: neue Frage", thema: "Wunsch: neues Thema", erkenntnis: "Erkenntnis", sonstiges: "Anmerkung" };
+export function notizTyp(n) {
+  if (n && n.typ && NOTIZ_TYP[n.typ]) return n.typ;
+  if (n && n.art === "wunsch") return "frage";
+  return n && n.frage_id ? "sonstiges" : "erkenntnis";
+}
+// Erledigt, wenn Nils es so gesetzt hat oder Claude im Katalog geantwortet hat (außer Nils hat danach wieder geöffnet)
+export function notizStatus(n, rueck) {
+  if (!n) return "offen";
+  if (n.status === "geloescht") return "geloescht";
+  if (n.status === "erledigt") return "erledigt";
+  const r = rueck && rueck[n.id];
+  if (r && !(n.wieder && n.wieder > r.zeit)) return "erledigt";
+  return "offen";
+}
+
 export function berichtText(doc, daten) {
   const fragen = {};
-  for (const t of daten.tests) for (const f of t.fragen) fragen[f.id] = f;
+  for (const t of daten.tests) for (const f of t.fragen) if (!f.aus) fragen[f.id] = f;
+  const alle = {};
+  for (const t of daten.tests) for (const f of t.fragen) alle[f.id] = f;
+  const rueck = daten.rueckmeldungen || {};
   const gueltig = (q, a) => a && fragen[q] && (!a.fp || a.fp === fragen[q].fp);
   const z = [];
   z.push("HBOD Lern-App: Bericht für die Besprechung mit Claude");
@@ -133,10 +160,11 @@ export function berichtText(doc, daten) {
   z.push("");
   z.push("== Stand je Test ==");
   for (const t of daten.tests) {
+    const fs = t.fragen.filter((f) => !f.aus);
     let b = 0, p = 0;
-    for (const f of t.fragen) { const a = doc.antworten[f.id]; if (gueltig(f.id, a)) { b++; p += a.punkte || 0; } }
+    for (const f of fs) { const a = doc.antworten[f.id]; if (gueltig(f.id, a)) { b++; p += a.punkte || 0; } }
     if (!b) continue;
-    z.push(`${t.id.toUpperCase()} ${t.titel}: ${b}/${t.fragen.length} beantwortet, ${Math.round((p / t.fragen.length) * 100)} % der Punkte`);
+    z.push(`${t.id.toUpperCase()} ${t.titel}: ${b}/${fs.length} beantwortet, ${Math.round((p / fs.length) * 100)} % der Punkte`);
   }
   if (Array.isArray(daten.themen) && daten.themen.length) {
     z.push("");
@@ -154,7 +182,7 @@ export function berichtText(doc, daten) {
   z.push("");
   z.push("== Fragen, die noch nicht sitzen (zuletzt falsch oder teilweise) ==");
   let nf = 0;
-  for (const t of daten.tests) for (const f of t.fragen) {
+  for (const f of Object.values(fragen)) {
     const a = doc.antworten[f.id];
     if (!gueltig(f.id, a) || a.punkte >= 1) continue;
     nf++;
@@ -167,13 +195,45 @@ export function berichtText(doc, daten) {
   z.push("");
   z.push("== Richtig, aber unsicher ==");
   let nu = 0;
-  for (const t of daten.tests) for (const f of t.fragen) { const a = doc.antworten[f.id]; if (gueltig(f.id, a) && a.punkte >= 1 && a.unsicher) { nu++; z.push(`${f.id.toUpperCase()} ${f.frage}`); } }
+  for (const f of Object.values(fragen)) { const a = doc.antworten[f.id]; if (gueltig(f.id, a) && a.punkte >= 1 && a.unsicher) { nu++; z.push(`${f.id.toUpperCase()} ${f.frage}`); } }
   if (!nu) z.push("Keine.");
   z.push("");
-  z.push("== Notizen und gemeldete Fehler ==");
-  const notizen = Object.values(doc.notizen || {}).sort((a, b) => (a.datum < b.datum ? -1 : 1));
-  if (!notizen.length) z.push("Keine.");
-  for (const n of notizen) z.push(`[${n.status || "offen"}] ${String(n.datum || "").slice(0, 10)} ${n.frage_id ? n.frage_id.toUpperCase() + " " : ""}${n.text}`);
+  z.push("== Als schwer bewertet ==");
+  const schwer = Object.entries(doc.bewertungen || {}).filter(([q, b]) => b && b.stufe === "schwer" && fragen[q] && (!b.fp || b.fp === fragen[q].fp)).map(([q]) => q).sort();
+  if (!schwer.length) z.push("Keine.");
+  for (const q of schwer.slice(0, 60)) z.push(`${q.toUpperCase()} ${fragen[q].frage}`);
+  if (schwer.length > 60) z.push(`… und ${schwer.length - 60} weitere.`);
+  z.push("");
+  const notizen = Object.values(doc.notizen || {}).filter((n) => n && notizStatus(n, rueck) !== "geloescht").sort((a, b) => (a.datum < b.datum ? -1 : 1));
+  const offen = notizen.filter((n) => notizStatus(n, rueck) === "offen");
+  const erledigt = notizen.filter((n) => notizStatus(n, rueck) === "erledigt");
+  z.push("== Offene Anmerkungen und Wünsche ==");
+  z.push("Für Claude: Vor jedem Einbau mit python3 inhalte/suche.py prüfen, ob es das schon gibt. Danach die Rückmeldung mit der ID in eckigen Klammern in inhalte/rueckmeldungen.py eintragen.");
+  if (!offen.length) z.push("Keine.");
+  for (const n of offen) {
+    const typ = notizTyp(n);
+    const f = n.frage_id ? alle[n.frage_id] : null;
+    z.push("");
+    z.push(`[${n.id}] ${String(n.datum || "").slice(0, 10)} · ${NOTIZ_TYP[typ]}${n.frage_id ? " · " + n.frage_id.toUpperCase() : ""}${n.pause ? " (bis zur Prüfung pausiert)" : ""}`);
+    if (f) {
+      z.push("  Frage: " + f.frage);
+      z.push("  Lösung laut App: " + loesungText(f));
+      if (f.aus) z.push("  (Diese Frage ist inzwischen ausgeblendet: " + f.aus + ")");
+    } else if (n.frage) z.push("  Frage: " + n.frage);
+    if (n.betrifft) z.push("  Betrifft: " + n.betrifft);
+    if (n.doppelt_zu) z.push("  Doppelt zu: " + n.doppelt_zu.toUpperCase() + (alle[n.doppelt_zu] ? " – " + alle[n.doppelt_zu].frage : ""));
+    if (n.text) z.push("  Nils: " + n.text);
+    if (n.antwort) z.push("  Antwort laut Nils: " + n.antwort);
+    if (n.quelle) z.push("  Quelle laut Nils: " + n.quelle);
+    if (Array.isArray(n.aehnlich) && n.aehnlich.length) z.push("  Die App fand ähnlich: " + n.aehnlich.map((x) => (/^t\d{2}-\d{2}$/.test(x) ? String(x).toUpperCase() : String(x))).join(", "));
+  }
+  z.push("");
+  z.push("== Erledigt ==");
+  if (!erledigt.length) z.push("Keine.");
+  else {
+    z.push(`${erledigt.length} erledigt, davon ${erledigt.filter((n) => rueck[n.id]).length} mit Rückmeldung von Claude. Die letzten:`);
+    for (const n of erledigt.slice(-15)) z.push(`[${n.id}] ${String(n.datum || "").slice(0, 10)} ${NOTIZ_TYP[notizTyp(n)]}${n.frage_id ? " " + n.frage_id.toUpperCase() : ""}: ${String(n.text || "").slice(0, 120)}${rueck[n.id] ? " → Claude: " + rueck[n.id].text : ""}`);
+  }
   return z.join("\n");
 }
 
