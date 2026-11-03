@@ -1,6 +1,6 @@
 # HBOD Lern-App
 
-Lern- und Prüfungs-App für E-Commerce und HBOD: 32 Tests, gut 400 Fragen, Tagesrunde mit Wiederholungsplan, schnelle Runden mit 5 oder 10 Fragen, Prüfungssimulation, Lernzettel und Notizen. Der Fortschritt wird auf jedem Gerät gespeichert und über einen persönlichen Lern-Code zwischen Handy und PC abgeglichen.
+Lern- und Prüfungs-App für E-Commerce und HBOD: 32 Tests, gut 400 Fragen, 23 Themen zum Vertiefen, Tagesrunde mit 5 Fragen und Wiederholungsplan, schnelle Runden mit 5 oder 10 Fragen, Prüfungssimulation, Lernzettel und Notizen. Antworten lassen sich mit einem Tipp im eigenen Claude-Chat erklären. Der Fortschritt wird auf jedem Gerät gespeichert und über einen persönlichen Lern-Code zwischen Handy und PC abgeglichen.
 
 ## Einmal einrichten (Netlify)
 
@@ -21,6 +21,7 @@ Wichtig: Die Seite über die GitHub-Verbindung veröffentlichen, nicht per Drag 
 
 ## Mit Claude besprechen
 
+- **In Claude erklären lassen:** Unter **Geräte → Deine Claude-Chats** einen oder mehrere Chats mit Namen und claude.ai-Link speichern (am besten ein Chat im Projekt HBOD, auch ein Projekt-Link geht). Unter jeder Erklärung wählt man dann den Chat. Die App kopiert Frage, eigene Antwort, Lösung, Erklärung, Hinweis und Quelle in die Zwischenablage und öffnet den Chat. Dort nur einfügen und senden. Ein Chat lässt sich per Link nicht zuverlässig vorausfüllen, deshalb der Weg über die Zwischenablage. Die Chats stehen in den Einstellungen und werden mit dem Lern-Code auf alle Geräte übertragen.
 - Unter **Geräte → Bericht-Link kopieren** gibt es einen Nur-Lese-Link (`/api/bericht?t=…`) mit Stand, Fehlern und Notizen als Text.
 - Alternativ „Bericht als Text kopieren“ oder bei einem Test „Antworten für Claude kopieren“ und in den Chat einfügen.
 
@@ -37,6 +38,7 @@ netlify/lib/kern.mjs    gemeinsame Logik: Zusammenführen, Bericht, Test-Speiche
 inhalte/                die Quellen des Fragenkatalogs
   dsl.py                Kurzschreibweise für Fragen (S, M, W, Z, R, P, T)
   q_a.py … q_f.py       Module A bis F
+  themen.py             Themen zum Vertiefen: Kurzerklärung und zugeordnete Frage-IDs
   build.py              baut public/fragen.json und enthält die Liste "Was ist neu"
 werkzeuge/lokal.mjs     lokaler Testserver mit Speicher im Arbeitsspeicher
 ```
@@ -44,9 +46,10 @@ werkzeuge/lokal.mjs     lokaler Testserver mit Speicher im Arbeitsspeicher
 ## Fragen ändern oder ergänzen
 
 1. Die passende Datei in `inhalte/` bearbeiten (Modul A bis F).
-2. In `inhalte/build.py` unter `AENDERUNGEN` kurz eintragen, was sich geändert hat, und `VERSION` sowie `STAND` anpassen.
-3. `python3 inhalte/build.py` ausführen. Das prüft den Katalog und schreibt `public/fragen.json`.
-4. Committen und pushen. Netlify veröffentlicht automatisch.
+2. Bei neuen oder ersetzten Fragen in `inhalte/themen.py` prüfen, zu welchen Themen sie gehören (Frage-ID in die Liste des Themas).
+3. In `inhalte/build.py` unter `AENDERUNGEN` kurz eintragen, was sich geändert hat, und `VERSION` sowie `STAND` anpassen.
+4. `python3 inhalte/build.py` ausführen. Das prüft Katalog und Themen und schreibt `public/fragen.json`.
+5. Committen und pushen. Netlify veröffentlicht automatisch.
 
 Regeln für die Pflege:
 
@@ -67,6 +70,8 @@ npm run lokal        # http://localhost:8888, Sync mit Speicher im Arbeitsspeich
 
 - **Abrufen statt Wiederlesen:** Jede Frage wird erst beantwortet, dann kommt die Erklärung.
 - **Verteiltes Wiederholen (Leitner, 5 Fächer):** richtig, dann nach 1, 3, 7, 14 und 30 Tagen wieder; falsch, dann am nächsten Tag. Richtig vor dem Termin (gleicher Tag, schnelle Runde, Test nochmal) lässt Fach und Termin unverändert. Gemeistert ab Fach 3, also dreimal zum Termin richtig.
+- **Tagesrunde:** standardmäßig 5 Fragen (einstellbar 5, 10, 15 oder 20), zuerst Fälliges, dann Neues.
+- **Themen vertiefen:** 23 Themen (z. B. GMV und Kennzahlen, Provision, Retouren, Zalando, EPR) mit Kurzerklärung und Merksatz. Gelernt wird in Runden zu 5 Fragen: zuerst Fälliges und Fehler aus dem Thema, dann neue Fragen in der Lernreihenfolge des Themas. Heute schon Beantwortetes kommt nach hinten, damit „Nächste 5 Fragen“ weiterführt. Unter jeder Erklärung führt „Thema vertiefen“ zum passenden Thema.
 - **Schnelle Runde:** 5 oder 10 Fragen ohne Freitext, aus allen Themen, einem Modul oder einem Test. Reihenfolge der Auswahl: fällig, zuletzt falsch, neu (reihum aus verschiedenen Tests), am längsten her. Mit Serie für richtige Antworten in Folge.
 - **Am PC:** Tasten 1 bis 9 wählen eine Antwort, Enter prüft und geht weiter.
 - **Mischen:** Die Tagesrunde mischt Themen, damit ähnliche Begriffe sicher unterschieden werden.

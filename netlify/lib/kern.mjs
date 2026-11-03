@@ -127,6 +127,7 @@ export function berichtText(doc, daten) {
   const teile = [];
   if (anz("tagesrunden")) teile.push(anz("tagesrunden") + " Tagesrunden");
   if (anz("runden")) teile.push(anz("runden") + " schnelle Runden");
+  if (anz("themen")) teile.push(anz("themen") + " Themenrunden");
   if (anz("pruefungen")) teile.push(anz("pruefungen") + " Prüfungssimulationen");
   if (teile.length) z.push("Durchgänge: " + teile.join(", ") + ".");
   z.push("");
@@ -136,6 +137,19 @@ export function berichtText(doc, daten) {
     for (const f of t.fragen) { const a = doc.antworten[f.id]; if (gueltig(f.id, a)) { b++; p += a.punkte || 0; } }
     if (!b) continue;
     z.push(`${t.id.toUpperCase()} ${t.titel}: ${b}/${t.fragen.length} beantwortet, ${Math.round((p / t.fragen.length) * 100)} % der Punkte`);
+  }
+  if (Array.isArray(daten.themen) && daten.themen.length) {
+    z.push("");
+    z.push("== Stand je Thema ==");
+    let nt = 0;
+    for (const th of daten.themen) {
+      let b = 0, p = 0, m = 0;
+      for (const q of th.fragen) { const a = doc.antworten[q]; if (gueltig(q, a)) { b++; p += a.punkte || 0; if ((a.box || 0) >= 3) m++; } }
+      if (!b) continue;
+      nt++;
+      z.push(`${th.titel}: ${b}/${th.fragen.length} beantwortet, ${Math.round((p / th.fragen.length) * 100)} % der Punkte, ${m} gemeistert`);
+    }
+    if (!nt) z.push("Noch keine Fragen aus den Themen beantwortet.");
   }
   z.push("");
   z.push("== Fragen, die noch nicht sitzen (zuletzt falsch oder teilweise) ==");
