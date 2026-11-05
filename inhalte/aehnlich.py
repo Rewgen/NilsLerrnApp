@@ -85,7 +85,7 @@ DOPPEL_SCHWELLE = 0.42
 def moegliche_doppel(fragen, verwandt_von, geprueft, schwelle=DOPPEL_SCHWELLE):
     """Paare sichtbarer Fragen (ohne Rechenaufgaben), die sich sehr ähneln und noch nicht bearbeitet sind.
     Rechenaufgaben mit gleichem Muster und anderen Zahlen sind gewollt und zählen nicht."""
-    idx = Index([(f["id"], frage_text(f)) for f in fragen if f["typ"] != "zahl" and not f.get("aus")])
+    idx = Index([(f["id"], frage_text(f)) for f in fragen if f["typ"] != "zahl"])
     out = []
     for s, a, b in idx.paare(schwelle):
         if verwandt_von.get(a) and verwandt_von.get(a) == verwandt_von.get(b):
@@ -97,7 +97,7 @@ def moegliche_doppel(fragen, verwandt_von, geprueft, schwelle=DOPPEL_SCHWELLE):
 
 
 def lade_katalog():
-    """Lädt Tests, Themen und Pflegelisten wie build.py (ohne fragen.json zu schreiben)."""
+    """Lädt Bereiche, Stapel und Pflegelisten wie build.py (ohne fragen.json zu schreiben)."""
     hier = os.path.dirname(os.path.abspath(__file__))
     if hier not in sys.path:
         sys.path.insert(0, hier)
@@ -106,14 +106,10 @@ def lade_katalog():
     for m in ["q_a", "q_b", "q_c", "q_d", "q_e", "q_f"]:
         importlib.import_module(m)
     import pflege
-    import themen
-    fragen = [f for t in dsl.TESTS for f in t["fragen"]]
-    for f in fragen:
-        if f["id"] in pflege.AUSBLENDEN:
-            f["aus"] = pflege.AUSBLENDEN[f["id"]]
+    fragen = [f for s in dsl.STAPEL for f in s["fragen"]]
     verwandt_von = {}
     for i, (ids, _) in enumerate(pflege.VERWANDT, 1):
         for q in ids.split():
             verwandt_von[q] = f"v{i:02d}"
     geprueft = {frozenset(p.split()) for p in pflege.GEPRUEFT}
-    return dsl, fragen, themen, pflege, verwandt_von, geprueft
+    return dsl, fragen, pflege, verwandt_von, geprueft

@@ -45,10 +45,11 @@ export function zusammenfuehren(doc, d) {
     const cur = doc.notizen[id];
     if (!cur || neuer(n.zeit, cur.zeit)) doc.notizen[id] = n;
   }
-  // Bewertungen (leicht/mittel/schwer) je Frage: die neueste gewinnt. Bleiben beim Zurücksetzen erhalten.
+  // Alte Bewertungen (leicht/mittel/schwer, bis Version 2.3) je Frage: die neueste gewinnt. Seit 3.0 steht die Bewertung in der Antwort.
   if (!doc.bewertungen || typeof doc.bewertungen !== "object") doc.bewertungen = {};
   for (const [q, b] of Object.entries(d.bewertungen || {})) {
     if (!QID_RE.test(q) || !b || typeof b !== "object" || !(b.stufe == null || ["leicht", "mittel", "schwer"].includes(b.stufe))) continue;
+    if (doc.resetZeit && !neuer(b.zeit, doc.resetZeit)) continue;
     const cur = doc.bewertungen[q];
     if (!cur || neuer(b.zeit, cur.zeit)) doc.bewertungen[q] = b;
   }
@@ -64,7 +65,7 @@ export function zusammenfuehren(doc, d) {
 
 function zuruecksetzen(doc) {
   const z = jetzt();
-  return Object.assign(leer(), { notizen: doc.notizen || {}, bewertungen: doc.bewertungen || {}, einstellungen: doc.einstellungen || null, erstellt: doc.erstellt || z, resetZeit: z });
+  return Object.assign(leer(), { notizen: doc.notizen || {}, einstellungen: doc.einstellungen || null, erstellt: doc.erstellt || z, resetZeit: z });
 }
 
 const json = (obj, status = 200) => new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" } });
@@ -135,74 +136,55 @@ export function notizStatus(n, rueck) {
   return "offen";
 }
 
+// "Schwer" = zuletzt falsch oder als schwer bewertet (Anki-Bewertung ab Version 3, ältere Bewertungen gelten weiter)
+export function istSchwer(a, alteBewertung) {
+  if (!a) return !!(alteBewertung && alteBewertung.stufe === "schwer");
+  if (a.bew) return a.bew === "falsch" || a.bew === "schwer";
+  return a.punkte < 1 || !!(alteBewertung && alteBewertung.stufe === "schwer");
+}
+
 export function berichtText(doc, daten) {
+  const stapel = daten.stapel || [];
   const fragen = {};
-  for (const t of daten.tests) for (const f of t.fragen) if (!f.aus) fragen[f.id] = f;
-  const alle = {};
-  for (const t of daten.tests) for (const f of t.fragen) alle[f.id] = f;
+  for (const s of stapel) for (const f of s.fragen) fragen[f.id] = f;
+  const alle = fragen;
   const rueck = daten.rueckmeldungen || {};
   const gueltig = (q, a) => a && fragen[q] && (!a.fp || a.fp === fragen[q].fp);
+  const alteBew = (q) => { const b = (doc.bewertungen || {})[q]; return b && fragen[q] && (!b.fp || b.fp === fragen[q].fp) ? b : null; };
   const z = [];
   z.push("HBOD Lern-App: Bericht für die Besprechung mit Claude");
   z.push("Erstellt: " + jetzt() + " · Fragenkatalog " + daten.version + " (Stand " + daten.stand + ")");
-  let beantw = 0, richtig = 0, meister = 0, gesamt = 0;
-  for (const q of Object.keys(fragen)) { gesamt++; const a = doc.antworten[q]; if (gueltig(q, a)) { beantw++; if (a.punkte >= 1) richtig++; if ((a.box || 0) >= 3) meister++; } }
-  z.push(`Gesamt: ${beantw} von ${gesamt} beantwortet, ${richtig} zuletzt richtig, ${meister} gemeistert (dreimal zum Termin richtig).`);
+  let beantw = 0, meister = 0, gesamt = 0;
+  for (const q of Object.keys(fragen)) { gesamt++; const a = doc.antworten[q]; if (gueltig(q, a)) { beantw++; if ((a.box || 0) >= 3) meister++; } }
+  z.push(`Gesamt: ${meister} von ${gesamt} Fragen gemeistert, ${beantw} schon gesehen.`);
   const tage = Object.keys(doc.aktivitaet || {}).sort();
-  if (tage.length) z.push("Gelernt an " + tage.length + " Tagen, zuletzt am " + tage[tage.length - 1] + ".");
-  const l = doc.laeufe || {}; const anz = (k) => (Array.isArray(l[k]) ? l[k].length : 0);
-  const teile = [];
-  if (anz("tagesrunden")) teile.push(anz("tagesrunden") + " Tagesrunden");
-  if (anz("runden")) teile.push(anz("runden") + " schnelle Runden");
-  if (anz("themen")) teile.push(anz("themen") + " Themenrunden");
-  if (anz("pruefungen")) teile.push(anz("pruefungen") + " Prüfungssimulationen");
-  if (teile.length) z.push("Durchgänge: " + teile.join(", ") + ".");
+  if (tage.length) z.push("Zuletzt gelernt am " + tage[tage.length - 1] + ".");
   z.push("");
-  z.push("== Stand je Test ==");
-  for (const t of daten.tests) {
-    const fs = t.fragen.filter((f) => !f.aus);
-    let b = 0, p = 0;
-    for (const f of fs) { const a = doc.antworten[f.id]; if (gueltig(f.id, a)) { b++; p += a.punkte || 0; } }
-    if (!b) continue;
-    z.push(`${t.id.toUpperCase()} ${t.titel}: ${b}/${fs.length} beantwortet, ${Math.round((p / fs.length) * 100)} % der Punkte`);
-  }
-  if (Array.isArray(daten.themen) && daten.themen.length) {
-    z.push("");
-    z.push("== Stand je Thema ==");
-    let nt = 0;
-    for (const th of daten.themen) {
-      let b = 0, p = 0, m = 0;
-      for (const q of th.fragen) { const a = doc.antworten[q]; if (gueltig(q, a)) { b++; p += a.punkte || 0; if ((a.box || 0) >= 3) m++; } }
+  z.push("== Stand je Stapel ==");
+  for (const m of daten.module || []) {
+    for (const sid of m.stapel) {
+      const s = stapel.find((x) => x.id === sid); if (!s) continue;
+      let b = 0, me = 0, sw = 0;
+      for (const f of s.fragen) { const a = doc.antworten[f.id]; if (gueltig(f.id, a)) { b++; if ((a.box || 0) >= 3) me++; if (istSchwer(a, alteBew(f.id))) sw++; } }
       if (!b) continue;
-      nt++;
-      z.push(`${th.titel}: ${b}/${th.fragen.length} beantwortet, ${Math.round((p / th.fragen.length) * 100)} % der Punkte, ${m} gemeistert`);
+      z.push(`${m.id} · ${s.titel}: ${me} von ${s.fragen.length} gemeistert, ${b} gesehen, ${sw} schwer`);
     }
-    if (!nt) z.push("Noch keine Fragen aus den Themen beantwortet.");
   }
   z.push("");
-  z.push("== Fragen, die noch nicht sitzen (zuletzt falsch oder teilweise) ==");
+  z.push("== Schwere Fragen (zuletzt falsch oder als schwer bewertet) ==");
   let nf = 0;
   for (const f of Object.values(fragen)) {
     const a = doc.antworten[f.id];
-    if (!gueltig(f.id, a) || a.punkte >= 1) continue;
+    const g = gueltig(f.id, a) ? a : null;
+    if (!istSchwer(g, alteBew(f.id))) continue;
     nf++;
+    if (nf > 80) continue;
     z.push(`${f.id.toUpperCase()} ${f.frage}`);
-    z.push("  Meine Antwort: " + (a.gegeben || "—") + (a.unsicher ? " (unsicher)" : ""));
+    if (g) z.push("  Zuletzt: " + (g.bew === "schwer" ? "richtig, aber schwer" : g.punkte < 1 ? "falsch, Antwort: " + (g.gegeben || "—") : "als schwer markiert") + " · " + String(g.zeit || "").slice(0, 10));
     if (f.typ !== "text") z.push("  Lösung: " + loesungText(f));
-    z.push("  Versuche: " + (a.versuche || 1) + ", zuletzt " + String(a.zeit || "").slice(0, 10));
   }
+  if (nf > 80) z.push(`… und ${nf - 80} weitere.`);
   if (!nf) z.push("Keine.");
-  z.push("");
-  z.push("== Richtig, aber unsicher ==");
-  let nu = 0;
-  for (const f of Object.values(fragen)) { const a = doc.antworten[f.id]; if (gueltig(f.id, a) && a.punkte >= 1 && a.unsicher) { nu++; z.push(`${f.id.toUpperCase()} ${f.frage}`); } }
-  if (!nu) z.push("Keine.");
-  z.push("");
-  z.push("== Als schwer bewertet ==");
-  const schwer = Object.entries(doc.bewertungen || {}).filter(([q, b]) => b && b.stufe === "schwer" && fragen[q] && (!b.fp || b.fp === fragen[q].fp)).map(([q]) => q).sort();
-  if (!schwer.length) z.push("Keine.");
-  for (const q of schwer.slice(0, 60)) z.push(`${q.toUpperCase()} ${fragen[q].frage}`);
-  if (schwer.length > 60) z.push(`… und ${schwer.length - 60} weitere.`);
   z.push("");
   const notizen = Object.values(doc.notizen || {}).filter((n) => n && notizStatus(n, rueck) !== "geloescht").sort((a, b) => (a.datum < b.datum ? -1 : 1));
   const offen = notizen.filter((n) => notizStatus(n, rueck) === "offen");
@@ -218,8 +200,8 @@ export function berichtText(doc, daten) {
     if (f) {
       z.push("  Frage: " + f.frage);
       z.push("  Lösung laut App: " + loesungText(f));
-      if (f.aus) z.push("  (Diese Frage ist inzwischen ausgeblendet: " + f.aus + ")");
-    } else if (n.frage) z.push("  Frage: " + n.frage);
+    } else if (n.frage_id) z.push("  Frage (gibt es nicht mehr im Katalog): " + (n.frage || n.frage_id));
+    else if (n.frage) z.push("  Frage: " + n.frage);
     if (n.betrifft) z.push("  Betrifft: " + n.betrifft);
     if (n.doppelt_zu) z.push("  Doppelt zu: " + n.doppelt_zu.toUpperCase() + (alle[n.doppelt_zu] ? " – " + alle[n.doppelt_zu].frage : ""));
     if (n.text) z.push("  Nils: " + n.text);
